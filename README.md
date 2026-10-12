@@ -51,6 +51,33 @@ Use `emr.core.state.ResearchStateStore` for validated, immutable JSON snapshots.
 
 The `pdf` extra (pypdf, pdfplumber, pdfminer.six) is opt-in. `emr paper scan /path/to/paper.pdf` emits a JSON **candidate** record with exact SHA-256, one-based pages, block-relative quote spans, sections/propositions/formula-like text and uncertain reading order. `emr paper matrix record1.json record2.json` combines offline records without inventing methods or findings. No PDF is uploaded and no network/API access occurs at runtime. Use an OS-level sandbox for adversarial PDFs: in-process page/byte limits are not a hard CPU/RAM bound.
 
-The combined core and PDF dependency closure is committed in the Python 3.12 CI lock with SHA-256 artifact hashes. Final CI installs this lock without re-resolving dependencies. This build profile is specific to Ubuntu 24.04 x86_64.
+The PDF dependency closure is resolved on a trusted Python 3.12 CI runner for review and must be committed with SHA-256 hashes before merge; final CI must consume the committed lock without regenerating it. This build profile is specific to Ubuntu 24.04 x86_64.
 
 The three Skills `paper-reading`, `literature-review` and `research-novelty` are **instructions**, not a claim of automated semantic article understanding. OCR, semantic claim verification and mathematical formula execution are intentionally excluded from this stage.
+
+## Phase 3: economic model facts (structural validation only)
+
+Phase 3 adds a strictly bounded **inert JSON expression AST** and explicit
+player, control, domain, dimension, stage, state and information-set contracts.
+There is **no expression string parser**, `eval`, `exec`, dynamic `sympify`,
+optimiser, best-response calculator, theorem proof or external API call.
+A structurally valid model **does not imply economic assumptions or equilibria
+are correct**.
+
+```bash
+emr model validate tests/fixtures/phase3/stackelberg_synthetic.json
+emr model tasks tests/fixtures/phase3/stackelberg_synthetic.json
+emr model validate tests/fixtures/phase3/omega_supply_taxonomy.json
+```
+
+The synthetic Stackelberg fixture encodes normalized payoff ASTs and
+`A > b*w` plus nonnegative-demand and price/wholesale constraints. The Omega
+fixture is a **research-type taxonomy illustration**, not a published
+equilibrium or verified replication; it is classified as a stochastic
+sequential game, not a continuous-time HJB model. See
+`references/economic-model-library/` and the new `model-spec` schema.
+
+The expression DSL deliberately rejects complex symbolic denominators,
+unregistered functions, unbounded parser input and continuous-time dynamics
+until separately designed and tested. Input text from PDF/LLM outputs remains
+untrusted and must be manually transcribed into the declared JSON AST.

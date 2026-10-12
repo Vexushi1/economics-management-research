@@ -56,7 +56,8 @@ class SkillRegistry:
 
 
 def default_registry() -> SkillRegistry:
-    """Phase 1 includes one planning Skill, not an implemented research engine."""
+    """Offline Skill descriptors only; registering them never imports executors."""
     result = SkillRegistry()
     result.register(SkillSpec("research-orchestrator"))
+    result.register(SkillSpec("economic-model-design", dependencies=("research-orchestrator",)))
     return result
