@@ -51,6 +51,6 @@ Use `emr.core.state.ResearchStateStore` for validated, immutable JSON snapshots.
 
 The `pdf` extra (pypdf, pdfplumber, pdfminer.six) is opt-in. `emr paper scan /path/to/paper.pdf` emits a JSON **candidate** record with exact SHA-256, one-based pages, block-relative quote spans, sections/propositions/formula-like text and uncertain reading order. `emr paper matrix record1.json record2.json` combines offline records without inventing methods or findings. No PDF is uploaded and no network/API access occurs at runtime. Use an OS-level sandbox for adversarial PDFs: in-process page/byte limits are not a hard CPU/RAM bound.
 
-The PDF dependency closure is resolved on a trusted Python 3.12 CI runner for review and must be committed with SHA-256 hashes before merge; final CI must consume the committed lock without regenerating it. This build profile is specific to Ubuntu 24.04 x86_64.
+The combined core and PDF dependency closure is committed in the Python 3.12 CI lock with SHA-256 artifact hashes. Final CI installs this lock without re-resolving dependencies. This build profile is specific to Ubuntu 24.04 x86_64.
 
 The three Skills `paper-reading`, `literature-review` and `research-novelty` are **instructions**, not a claim of automated semantic article understanding. OCR, semantic claim verification and mathematical formula execution are intentionally excluded from this stage.

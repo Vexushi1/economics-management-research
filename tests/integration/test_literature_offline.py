@@ -7,7 +7,7 @@ from jsonschema import Draft202012Validator
 
 from emr.adapters.pdf_extract import extract_pdf
 from emr.core.papers import literature_matrix, paper_record
-from emr.core.provenance import anchor_matches, SourceAnchor
+from emr.core.provenance import SourceAnchor, anchor_matches
 
 
 def test_pdf_to_grounded_matrix(sample_pdf):

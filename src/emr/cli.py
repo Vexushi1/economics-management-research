@@ -39,9 +39,9 @@ def main(argv: Sequence[str] | None = None) -> int:
         return 0
 
     if args.command == "paper":
-        from emr.adapters.pdf_extract import PdfExtractionError, extract_pdf
         from jsonschema.exceptions import ValidationError
 
+        from emr.adapters.pdf_extract import PdfExtractionError, extract_pdf
         from emr.core.papers import (
             literature_matrix,
             paper_record,
@@ -74,7 +74,7 @@ def main(argv: Sequence[str] | None = None) -> int:
             print(json.dumps(output, ensure_ascii=False, indent=2))
             return 0
         except (PdfExtractionError, OSError, ValueError, KeyError, UnicodeError, ValidationError):
-            print(f"paper operation failed: invalid or unreadable input", file=sys.stderr)
+            print("paper operation failed: invalid or unreadable input", file=sys.stderr)
             return 2
 
     registry = default_registry()

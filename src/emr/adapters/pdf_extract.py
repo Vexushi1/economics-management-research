@@ -116,7 +116,7 @@ def extract_pdf(path: Path, *, max_bytes: int = MAX_PDF_BYTES, max_pages: int = 
             if len(document.pages) != count:
                 raise PdfExtractionError("PDF parsers disagree on page count")
             layouts = extract_pages(io.BytesIO(data), maxpages=max_pages)
-            for number, (plumber_page, layout) in enumerate(zip(document.pages, layouts), 1):
+            for number, (plumber_page, layout) in enumerate(zip(document.pages, layouts, strict=True), 1):
                 height = float(layout.height)
                 width = float(layout.width)
                 blocks: list[TextBlock] = []
