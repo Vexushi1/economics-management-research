@@ -109,3 +109,88 @@ def test_malicious_text_is_inert(tmp_path):
     store.save("safe.json", {**base_state(), "notes": [hostile]})
     assert not sentinel.exists()
     assert store.load("safe.json")["notes"] == [hostile]
+
+
+def _artifact(name: str) -> dict[str, str]:
+    """Build a valid inert artifact record for dependency tests."""
+    return {
+        "uri": name,
+        "sha256": "a" * 64,
+        "schema_version": "1",
+        "created_by": "self-review",
+        "created_at": "2026-10-12T12:00:00Z",
+        "status": "VALID",
+    }
+
+
+def test_valid_dependency_dag_roundtrip(tmp_path):
+    state = {
+        **base_state(),
+        "artifacts": [_artifact(name) for name in ("source", "model", "proof")],
+        "artifact_dependencies": [
+            {"parent": "source", "child": "model"},
+            {"parent": "model", "child": "proof"},
+        ],
+        "workflow_nodes": [{"id": "read", "skill_name": "paper-reading", "status": "PENDING"}],
+    }
+    store = ResearchStateStore(tmp_path)
+    result = store.save("valid-dag.json", state)
+    assert store.load("valid-dag.json", expected_sha256=result.sha256) == state
+
+
+@pytest.mark.parametrize(
+    ("artifacts", "edges", "message"),
+    [
+        ([], [{"parent": "missing", "child": "orphan"}], "unknown artifact"),
+        (["a"], [{"parent": "a", "child": "a"}], "self-referential"),
+        (["a", "b"], [{"parent": "a", "child": "b"}, {"parent": "b", "child": "a"}], "cyclic"),
+        (["a", "b", "c"], [{"parent": "a", "child": "b"}, {"parent": "b", "child": "c"}, {"parent": "c", "child": "a"}], "cyclic"),
+        (["a", "b"], [{"parent": "a", "child": "b"}, {"parent": "a", "child": "b"}], "duplicate artifact dependency"),
+    ],
+)
+def test_invalid_dependency_graph_rejected_before_write(tmp_path, artifacts, edges, message):
+    store = ResearchStateStore(tmp_path)
+    invalid = {
+        **base_state(),
+        "artifacts": [_artifact(name) for name in artifacts],
+        "artifact_dependencies": edges,
+    }
+    with pytest.raises(StateValidationError, match=message):
+        store.save("invalid.json", invalid)
+    assert not (tmp_path / "invalid.json").exists()
+
+
+def test_duplicate_artifact_id_rejected():
+    with pytest.raises(StateValidationError, match="duplicate artifact uri"):
+        validate_research_state({**base_state(), "artifacts": [_artifact("a"), _artifact("a")]})
+
+
+def test_duplicate_workflow_node_id_rejected():
+    with pytest.raises(StateValidationError, match="duplicate workflow node id"):
+        validate_research_state(
+            {
+                **base_state(),
+                "workflow_nodes": [
+                    {"id": "prepare", "skill_name": "planner", "status": "PENDING"},
+                    {"id": "prepare", "skill_name": "planner", "status": "READY"},
+                ],
+            }
+        )
+
+
+def test_tampered_dependency_graph_rejected_during_load(tmp_path):
+    store = ResearchStateStore(tmp_path)
+    (tmp_path / "bad-graph.json").write_text(
+        json.dumps(
+            {
+                **base_state(),
+                "artifacts": [_artifact("a"), _artifact("b")],
+                "artifact_dependencies": [
+                    {"parent": "a", "child": "b"},
+                    {"parent": "b", "child": "a"},
+                ],
+            }
+        )
+    )
+    with pytest.raises(StateValidationError, match="cyclic"):
+        store.load("bad-graph.json")

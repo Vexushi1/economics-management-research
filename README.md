@@ -10,10 +10,11 @@ Analytical games (Stackelberg/Nash/contract design), stochastic operations, empi
 
 ## Setup
 
-The targeted interpreter is **Python 3.12.x** (3.13 is excluded until tested). From a fresh environment:
+The targeted interpreter is **Python 3.12.x** (3.13 is excluded until tested). For a reproducible setup on Ubuntu 24.04 x86_64 / Python 3.12:
 
 ```bash
-python -m pip install -e '.[math,dev]'
+python -m pip install --require-hashes --only-binary=:all: -r requirements/ci-py312-linux.lock
+python -m pip install --no-deps --no-build-isolation -e .
 python -m ruff check src tests
 python -m pytest -q
 emr inspect
@@ -21,7 +22,7 @@ emr validate
 emr plan --type analytical_game --description 'Compare two contracts'
 ```
 
-`core-offline` has one offline runtime dependency (`jsonschema`) for authoritative state validation. The optional `math` extra pins SymPy and NumPy. The `dev` extra pins pytest and Ruff. Installing packages requires a package source (e.g. PyPI or a prepared wheelhouse); **runtime** research commands make no network calls. Exact application dependencies are pinned in `pyproject.toml`; production/research and CI installations use a separately maintained, hashed Python 3.12 CI dependency lock. Review `requirements/` for platform scope and exact hash constraints.
+`core-offline` depends only on `jsonschema` for offline state validation. The optional `math` extra pins SymPy and NumPy. The `dev` extra pins pytest and Ruff. Installing packages requires a package source (e.g. PyPI or a prepared wheelhouse); **runtime** research commands make no network calls. Exact application dependencies are pinned in `pyproject.toml`; production/research and CI installations use a separately maintained, hashed Python 3.12 CI dependency lock. Review `requirements/` for platform scope and exact hash constraints.
 
 GitHub Actions validates the source on Python 3.12 for pull requests and pushes to `main` using a read-only token. GitHub Actions are not a substitute for independently verifying analytic proofs.
 
@@ -44,4 +45,4 @@ Numerical consistency is not mathematical proof. Unsupported statements must be 
 
 ## Research-state snapshots
 
-Use `emr.core.state.ResearchStateStore` for validated, immutable JSON snapshots. Each revision requires a new filename. `emr validate --state path/to/state.json` checks a snapshot. The `schemas/research-state.schema.json` file is mirrored as an installed package resource. This is **metadata validation**, not a proof of economic propositions.
+Use `emr.core.state.ResearchStateStore` for validated, immutable JSON snapshots. Each revision requires a new filename. `emr validate --state path/to/state.json` checks a snapshot. The `schemas/research-state.schema.json` file is mirrored as an installed package resource. In addition to schema checks, the implementation rejects duplicate artifact and workflow node identities, unknown artifact dependency endpoints, duplicate edges, self-dependencies and cyclic artifact dependency graphs. This is **metadata validation**, not a proof of economic propositions.

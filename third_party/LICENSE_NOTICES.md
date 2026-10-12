@@ -1,5 +1,7 @@
 # LICENSE_NOTICES.md — 第三方版权、许可与再发布限制审计
 
+> **状态更新（Phase 1）**：下文第 1—5 节保留 2026-10-12 Phase 0B 的历史审计快照。此后项目所有者已决定采用 MIT，根目录已有 `LICENSE`；`solving-model` 已确定独立净室重写，不直接复制源码。其余逐文件许可、传递依赖及 SBOM 未决事项仍保留。当前适用决策以本说明及文末 Phase 1 记录为准。
+
 > Phase 0B 文档审计 / 2026-10-12。关联：`SOURCES.md`、`docs/ENVIRONMENT_MATRIX.md`、`docs/DEPENDENCY_RISKS.md`、`MODIFICATION_PLAN.md`。  
 > **警告：本仓库目前未复制第三方 Skill 源码，也未决定本仓库自有代码的最终 LICENSE。** 以下仅为许可证证据和未来拟复用范围审查，不构成法律意见，也不应作为“所有模块已经获得再发布许可”的证明。
 

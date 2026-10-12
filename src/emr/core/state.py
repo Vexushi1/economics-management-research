@@ -14,6 +14,7 @@ import json
 import os
 import re
 import tempfile
+from collections import deque
 from collections.abc import Mapping
 from dataclasses import dataclass
 from datetime import datetime
@@ -30,7 +31,7 @@ _RFC3339 = re.compile(
 
 
 def _is_rfc3339_datetime(value: object) -> bool:
-    """Strict timestamp check independent of optional format packages."""
+    """Strict timestamp check with no jsonschema optional format dependencies."""
     if not isinstance(value, str) or _RFC3339.fullmatch(value) is None:
         return False
     try:
@@ -82,10 +83,51 @@ def _validator() -> Draft202012Validator:
     return Draft202012Validator(schema, format_checker=_FORMAT_CHECKER)
 
 
+def _validate_references(state: dict[str, Any]) -> None:
+    """Reject ambiguous artifact identities and cyclic/dangling references.
+
+    JSON Schema validates shape but cannot express graph acyclicity and
+    cross-field referential integrity. This iterative validation is O(V + E)
+    and deliberately does not execute or interpret artifact contents.
+    """
+    uris = [artifact["uri"] for artifact in state["artifacts"]]
+    if len(uris) != len(set(uris)):
+        raise StateValidationError("duplicate artifact uri")
+    node_ids = [node["id"] for node in state.get("workflow_nodes", [])]
+    if len(node_ids) != len(set(node_ids)):
+        raise StateValidationError("duplicate workflow node id")
+
+    adjacency: dict[str, list[str]] = {uri: [] for uri in uris}
+    indegree = dict.fromkeys(uris, 0)
+    seen_edges: set[tuple[str, str]] = set()
+    for edge in state.get("artifact_dependencies", []):
+        parent, child = edge["parent"], edge["child"]
+        if parent not in adjacency or child not in adjacency:
+            raise StateValidationError("artifact dependency refers to unknown artifact")
+        if parent == child:
+            raise StateValidationError("self-referential artifact dependency")
+        if (parent, child) in seen_edges:
+            raise StateValidationError("duplicate artifact dependency")
+        seen_edges.add((parent, child))
+        adjacency[parent].append(child)
+        indegree[child] += 1
+
+    available = deque(uri for uri, degree in indegree.items() if degree == 0)
+    visited = 0
+    while available:
+        visited += 1
+        for child in adjacency[available.popleft()]:
+            indegree[child] -= 1
+            if indegree[child] == 0:
+                available.append(child)
+    if visited != len(uris):
+        raise StateValidationError("cyclic artifact dependency")
+
+
 def validate_research_state(state: Mapping[str, Any]) -> dict[str, Any]:
     """Validate metadata and return JSON-normalized data, without executing text.
 
-    Enforces Draft 2020-12 JSON Schema including formats. Unknown keys fail.
+    Enforces Draft 2020-12 JSON Schema, graph integrity and unique identities.
     JSON serialization is limited to 1 MiB. This does not claim the evidence,
     formulas or scientific assertions in the metadata have been proven.
     """
@@ -100,6 +142,7 @@ def validate_research_state(state: Mapping[str, Any]) -> dict[str, Any]:
             text, object_pairs_hook=_no_duplicates, parse_constant=_reject_number_constant
         )
         _validator().validate(normalized)
+        _validate_references(normalized)
     except (RecursionError, ValueError) as exc:
         if isinstance(exc, StateValidationError):
             raise
