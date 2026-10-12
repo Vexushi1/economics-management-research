@@ -7,8 +7,8 @@ import pytest
 from jsonschema import Draft202012Validator
 
 from emr.domain.game import (
-    GameSpecValidationError,
     MAX_EXPRESSION_DEPTH,
+    GameSpecValidationError,
     build_best_response_tasks,
     validate_game_spec,
 )
