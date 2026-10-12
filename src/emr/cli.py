@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import sys
 from collections.abc import Sequence
 from dataclasses import asdict
 from pathlib import Path
@@ -25,11 +26,56 @@ def main(argv: Sequence[str] | None = None) -> int:
     plan = commands.add_parser("plan", help="generate a static planning DAG")
     plan.add_argument("--type", required=True, choices=[t.value for t in ResearchType])
     plan.add_argument("--description", required=True)
+    paper = commands.add_parser("paper", help="offline, source-grounded PDF literature operations")
+    pdf_commands = paper.add_subparsers(dest="paper_action", required=True)
+    scan = pdf_commands.add_parser("scan", help="extract unverified candidates from local PDF")
+    scan.add_argument("source", type=Path)
+    matrix = pdf_commands.add_parser("matrix", help="combine existing paper-record JSON files")
+    matrix.add_argument("records", nargs="+", type=Path)
     args = parser.parse_args(argv)
 
     if args.command == "inspect":
-        print(json.dumps({"version": __version__, "mode": "phase1-skeleton"}))
+        print(json.dumps({"version": __version__, "mode": "phase2-offline-pdf"}))
         return 0
+
+    if args.command == "paper":
+        from emr.adapters.pdf_extract import PdfExtractionError, extract_pdf
+        from jsonschema.exceptions import ValidationError
+
+        from emr.core.papers import (
+            literature_matrix,
+            paper_record,
+            validate_literature_matrix,
+            validate_paper_record,
+        )
+
+        try:
+            if args.paper_action == "scan":
+                output = paper_record(extract_pdf(args.source))
+                validate_paper_record(output)
+            else:
+                from emr.core.state import MAX_STATE_BYTES, _no_duplicates, _reject_number_constant
+
+                records = []
+                for source in args.records:
+                    with source.open("rb") as stream:
+                        raw = stream.read(MAX_STATE_BYTES + 1)
+                    if len(raw) > MAX_STATE_BYTES:
+                        raise ValueError("oversized record")
+                    record = json.loads(
+                        raw.decode("utf-8"),
+                        object_pairs_hook=_no_duplicates,
+                        parse_constant=_reject_number_constant,
+                    )
+                    validate_paper_record(record)
+                    records.append(record)
+                output = literature_matrix(records)
+                validate_literature_matrix(output)
+            print(json.dumps(output, ensure_ascii=False, indent=2))
+            return 0
+        except (PdfExtractionError, OSError, ValueError, KeyError, UnicodeError, ValidationError):
+            print(f"paper operation failed: invalid or unreadable input", file=sys.stderr)
+            return 2
 
     registry = default_registry()
     registry.validate()

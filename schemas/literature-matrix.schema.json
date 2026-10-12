@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/emr/literature-matrix-v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "rows", "research_gap_status"],
+  "properties": {
+    "schema_version": {"const": "1"},
+    "research_gap_status": {"enum": ["INSUFFICIENT_EVIDENCE", "NOT_VERIFIED"]},
+    "rows": {"type": "array", "items": {"type": "object", "additionalProperties": false, "required": ["file_sha256", "title", "title_status", "doi_candidates", "methods", "mechanisms", "findings"], "properties": {"file_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"}, "title": {"type": ["string", "null"]}, "title_status": {"const": "NOT_VERIFIED"}, "doi_candidates": {"type": "array", "items": {"type": "string"}}, "methods": {"$ref": "#/$defs/unknown"}, "mechanisms": {"$ref": "#/$defs/unknown"}, "findings": {"type": "array", "maxItems": 0}}}}
+  },
+  "$defs": {"unknown": {"type": "object", "additionalProperties": false, "required": ["value", "status"], "properties": {"value": {"type": "null"}, "status": {"const": "UNKNOWN"}}}}
+}

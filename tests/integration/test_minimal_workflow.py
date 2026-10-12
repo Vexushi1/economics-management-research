@@ -7,7 +7,7 @@ from emr.cli import main
 
 def test_cli_inspection_and_validation(capsys) -> None:
     assert main(["inspect"]) == 0
-    assert json.loads(capsys.readouterr().out)["mode"] == "phase1-skeleton"
+    assert json.loads(capsys.readouterr().out)["mode"] == "phase2-offline-pdf"
     assert main(["validate"]) == 0
     assert json.loads(capsys.readouterr().out)["registry"] == "valid"
 

@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/emr/paper-record-v1",
+  "title": "Unverified Paper Record",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "file_sha256", "pages", "title", "doi_candidates", "sections", "proposition_candidates", "equation_candidates", "metadata", "research_questions", "players", "decision_variables", "economic_mechanisms", "claims", "evidence_status"],
+  "properties": {
+    "schema_version": {"const": "1"},
+    "file_sha256": {"$ref": "#/$defs/hash"},
+    "pages": {"type": "integer", "minimum": 1, "maximum": 80},
+    "title": {"$ref": "#/$defs/candidateTitle"},
+    "doi_candidates": {"type": "array", "uniqueItems": true, "items": {"type": "string", "pattern": "^10\\.[0-9]{4,9}/"}},
+    "sections": {"type": "array", "items": {"$ref": "#/$defs/anchoredText"}},
+    "proposition_candidates": {"type": "array", "items": {"$ref": "#/$defs/anchoredText"}},
+    "equation_candidates": {"type": "array", "items": {"$ref": "#/$defs/anchoredText"}},
+    "metadata": {"type": "object", "additionalProperties": false, "required": ["author", "journal", "first_online_year", "volume_year"], "properties": {"author": {"type": ["string", "null"]}, "journal": {"type": ["string", "null"]}, "first_online_year": {"type": ["integer", "null"], "minimum": 1900}, "volume_year": {"type": ["integer", "null"], "minimum": 1900}}},
+    "research_questions": {"type": "array", "items": {"type": "string"}},
+    "players": {"type": "array", "items": {"type": "string"}},
+    "decision_variables": {"type": "array", "items": {"type": "string"}},
+    "economic_mechanisms": {"type": "array", "items": {"type": "string"}},
+    "claims": {"type": "array", "items": {"type": "object"}},
+    "evidence_status": {"const": "NOT_VERIFIED"}
+  },
+  "$defs": {
+    "hash": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "candidateTitle": {"type": "object", "additionalProperties": false, "required": ["value", "status"], "properties": {"value": {"type": ["string", "null"]}, "status": {"const": "NOT_VERIFIED"}}},
+    "anchoredText": {"type": "object", "additionalProperties": false, "required": ["text", "anchor", "status"], "properties": {"text": {"type": "string"}, "anchor": {"$ref": "#/$defs/anchor"}, "status": {"const": "NOT_VERIFIED"}}},
+    "anchor": {"type": "object", "additionalProperties": false, "required": ["file_sha256", "page", "block", "start", "end", "quote"], "properties": {"file_sha256": {"$ref": "#/$defs/hash"}, "page": {"type": "integer", "minimum": 1}, "block": {"type": "integer", "minimum": 0}, "start": {"type": "integer", "minimum": 0}, "end": {"type": "integer", "minimum": 1}, "quote": {"type": "string", "minLength": 1}}}
+  }
+}

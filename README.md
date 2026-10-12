@@ -2,7 +2,7 @@
 
 Research-first, offline-capable Python scaffolding for economics and management research.
 
-**Phase 1 status: interface contracts and CI only.** This release does **not** solve game-theoretic equilibria, verify theorems, parse untrusted formulas, replicate papers or invoke any LLM service. It provides a static research plan, a minimal artifact dependency store and an abstract solver interface.
+**Phase 2: offline PDF candidate extraction and provenance.** This release does **not** solve game-theoretic equilibria, verify theorems, parse untrusted formulas into executable expressions, infer economic findings automatically or invoke an LLM service. PDF metadata and mathematical expressions are unverified candidates.
 
 ## Research scope
 
@@ -46,3 +46,11 @@ Numerical consistency is not mathematical proof. Unsupported statements must be 
 ## Research-state snapshots
 
 Use `emr.core.state.ResearchStateStore` for validated, immutable JSON snapshots. Each revision requires a new filename. `emr validate --state path/to/state.json` checks a snapshot. The `schemas/research-state.schema.json` file is mirrored as an installed package resource. In addition to schema checks, the implementation rejects duplicate artifact and workflow node identities, unknown artifact dependency endpoints, duplicate edges, self-dependencies and cyclic artifact dependency graphs. This is **metadata validation**, not a proof of economic propositions.
+
+## Optional Phase 2 PDF and literature modules
+
+The `pdf` extra (pypdf, pdfplumber, pdfminer.six) is opt-in. `emr paper scan /path/to/paper.pdf` emits a JSON **candidate** record with exact SHA-256, one-based pages, block-relative quote spans, sections/propositions/formula-like text and uncertain reading order. `emr paper matrix record1.json record2.json` combines offline records without inventing methods or findings. No PDF is uploaded and no network/API access occurs at runtime. Use an OS-level sandbox for adversarial PDFs: in-process page/byte limits are not a hard CPU/RAM bound.
+
+The PDF dependency closure is resolved on a trusted Python 3.12 CI runner for review and must be committed with SHA-256 hashes before merge; final CI must consume the committed lock without regenerating it. This build profile is specific to Ubuntu 24.04 x86_64.
+
+The three Skills `paper-reading`, `literature-review` and `research-novelty` are **instructions**, not a claim of automated semantic article understanding. OCR, semantic claim verification and mathematical formula execution are intentionally excluded from this stage.
