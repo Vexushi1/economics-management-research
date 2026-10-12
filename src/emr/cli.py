@@ -32,6 +32,12 @@ def main(argv: Sequence[str] | None = None) -> int:
     scan.add_argument("source", type=Path)
     matrix = pdf_commands.add_parser("matrix", help="combine existing paper-record JSON files")
     matrix.add_argument("records", nargs="+", type=Path)
+    model = commands.add_parser("model", help="validate inert JSON model facts")
+    model_commands = model.add_subparsers(dest="model_action", required=True)
+    for action in ("validate", "tasks"):
+        model_commands.add_parser(
+            action, help="check model facts" if action == "validate" else "plan unexecuted response tasks"
+        ).add_argument("source", type=Path)
     args = parser.parse_args(argv)
 
     if args.command == "inspect":
@@ -39,9 +45,9 @@ def main(argv: Sequence[str] | None = None) -> int:
         return 0
 
     if args.command == "paper":
+        from emr.adapters.pdf_extract import PdfExtractionError, extract_pdf
         from jsonschema.exceptions import ValidationError
 
-        from emr.adapters.pdf_extract import PdfExtractionError, extract_pdf
         from emr.core.papers import (
             literature_matrix,
             paper_record,
@@ -74,7 +80,36 @@ def main(argv: Sequence[str] | None = None) -> int:
             print(json.dumps(output, ensure_ascii=False, indent=2))
             return 0
         except (PdfExtractionError, OSError, ValueError, KeyError, UnicodeError, ValidationError):
-            print("paper operation failed: invalid or unreadable input", file=sys.stderr)
+            print(f"paper operation failed: invalid or unreadable input", file=sys.stderr)
+            return 2
+
+    if args.command == "model":
+        from emr.core.state import _no_duplicates, _reject_number_constant
+        from emr.domain.game import (
+            MAX_MODEL_BYTES, GameSpecValidationError, build_best_response_tasks,
+            validate_game_spec,
+        )
+
+        try:
+            if args.source.is_symlink() or not args.source.is_file():
+                raise GameSpecValidationError("model must be a regular local JSON file")
+            with args.source.open("rb") as handle:
+                raw = handle.read(MAX_MODEL_BYTES + 1)
+            if len(raw) > MAX_MODEL_BYTES:
+                raise GameSpecValidationError("model exceeds size limit")
+            data = json.loads(
+                raw.decode("utf-8"), object_pairs_hook=_no_duplicates,
+                parse_constant=_reject_number_constant,
+            )
+            checked = validate_game_spec(data)
+            output = {"classification": checked.classification, "warnings": checked.warnings,
+                      "status": "STRUCTURALLY_VALID_NOT_SOLVED"}
+            if args.model_action == "tasks":
+                output["tasks"] = [asdict(t) for t in build_best_response_tasks(checked)]
+            print(json.dumps(output, indent=2))
+            return 0
+        except (OSError, UnicodeError, ValueError, RecursionError):
+            print("model operation failed: invalid or unsafe input", file=sys.stderr)
             return 2
 
     registry = default_registry()

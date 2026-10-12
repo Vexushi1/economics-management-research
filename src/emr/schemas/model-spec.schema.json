@@ -1,0 +1,587 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Vexushi1/economics-management-research/schemas/model-spec.schema.json",
+  "title": "Phase 3 bounded and inert economic model facts",
+  "description": "All formulae are JSON AST data; this schema does not evaluate expressions or establish an equilibrium.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "dsl_version",
+    "model_id",
+    "time",
+    "symbols",
+    "players",
+    "decisions",
+    "information_sets",
+    "signals",
+    "constraints",
+    "source"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1"
+    },
+    "dsl_version": {
+      "const": "1"
+    },
+    "model_id": {
+      "type": "string",
+      "pattern": "^[A-Za-z][A-Za-z0-9_]{0,31}$"
+    },
+    "time": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "stages"
+      ],
+      "properties": {
+        "kind": {
+          "enum": [
+            "discrete",
+            "continuous"
+          ]
+        },
+        "stages": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 12
+        }
+      }
+    },
+    "symbols": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/symbol"
+      },
+      "minItems": 1,
+      "maxItems": 64
+    },
+    "players": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/player"
+      },
+      "minItems": 1,
+      "maxItems": 12
+    },
+    "decisions": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/decision"
+      },
+      "minItems": 1,
+      "maxItems": 40
+    },
+    "information_sets": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/information_set"
+      },
+      "minItems": 1,
+      "maxItems": 40
+    },
+    "signals": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/signal"
+      },
+      "minItems": 0,
+      "maxItems": 80
+    },
+    "constraints": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/constraint"
+      },
+      "minItems": 0,
+      "maxItems": 80
+    },
+    "source": {
+      "$ref": "#/$defs/source"
+    }
+  },
+  "$defs": {
+    "expr": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "op",
+            "value"
+          ],
+          "properties": {
+            "op": {
+              "const": "const"
+            },
+            "value": {
+              "type": "string",
+              "pattern": "^-?(?:0|[1-9][0-9]{0,11})(?:\\.[0-9]{1,8})?$",
+              "maxLength": 24
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "op",
+            "name"
+          ],
+          "properties": {
+            "op": {
+              "const": "symbol"
+            },
+            "name": {
+              "type": "string",
+              "pattern": "^[A-Za-z][A-Za-z0-9_]{0,31}$"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "op",
+            "arg"
+          ],
+          "properties": {
+            "op": {
+              "const": "neg"
+            },
+            "arg": {
+              "$ref": "#/$defs/expr"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "op",
+            "args"
+          ],
+          "properties": {
+            "op": {
+              "enum": [
+                "add",
+                "mul"
+              ]
+            },
+            "args": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/expr"
+              },
+              "minItems": 2,
+              "maxItems": 6
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "op",
+            "left",
+            "right"
+          ],
+          "properties": {
+            "op": {
+              "enum": [
+                "sub",
+                "div"
+              ]
+            },
+            "left": {
+              "$ref": "#/$defs/expr"
+            },
+            "right": {
+              "$ref": "#/$defs/expr"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "op",
+            "base",
+            "exponent"
+          ],
+          "properties": {
+            "op": {
+              "const": "pow"
+            },
+            "base": {
+              "$ref": "#/$defs/expr"
+            },
+            "exponent": {
+              "type": "integer",
+              "minimum": -4,
+              "maximum": 4
+            }
+          }
+        }
+      ]
+    },
+    "domain": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "lower",
+        "upper",
+        "lower_closed",
+        "upper_closed"
+      ],
+      "properties": {
+        "type": {
+          "const": "interval"
+        },
+        "lower": {
+          "oneOf": [
+            {
+              "type": "string",
+              "pattern": "^-?(?:0|[1-9][0-9]{0,11})(?:\\.[0-9]{1,8})?$",
+              "maxLength": 24
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "upper": {
+          "oneOf": [
+            {
+              "type": "string",
+              "pattern": "^-?(?:0|[1-9][0-9]{0,11})(?:\\.[0-9]{1,8})?$",
+              "maxLength": 24
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "lower_closed": {
+          "type": "boolean"
+        },
+        "upper_closed": {
+          "type": "boolean"
+        }
+      }
+    },
+    "symbol": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "role",
+        "quantity_type",
+        "unit",
+        "domain",
+        "stochastic",
+        "distribution_status"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "pattern": "^[A-Za-z][A-Za-z0-9_]{0,31}$"
+        },
+        "role": {
+          "enum": [
+            "parameter",
+            "control",
+            "state"
+          ]
+        },
+        "quantity_type": {
+          "enum": [
+            "general",
+            "price",
+            "effort",
+            "probability",
+            "demand"
+          ]
+        },
+        "unit": {
+          "type": "object",
+          "properties": {
+            "currency": {
+              "type": "integer",
+              "minimum": -4,
+              "maximum": 4
+            },
+            "quantity": {
+              "type": "integer",
+              "minimum": -4,
+              "maximum": 4
+            },
+            "time": {
+              "type": "integer",
+              "minimum": -4,
+              "maximum": 4
+            }
+          },
+          "additionalProperties": false
+        },
+        "domain": {
+          "$ref": "#/$defs/domain"
+        },
+        "stochastic": {
+          "type": "boolean"
+        },
+        "distribution_status": {
+          "enum": [
+            "KNOWN",
+            "UNSPECIFIED",
+            "NOT_APPLICABLE"
+          ]
+        }
+      }
+    },
+    "player": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "objective"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[A-Za-z][A-Za-z0-9_]{0,31}$"
+        },
+        "objective": {
+          "$ref": "#/$defs/expr"
+        }
+      }
+    },
+    "decision": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "player",
+        "symbol",
+        "stage",
+        "information_set"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[A-Za-z][A-Za-z0-9_]{0,31}$"
+        },
+        "player": {
+          "type": "string",
+          "pattern": "^[A-Za-z][A-Za-z0-9_]{0,31}$"
+        },
+        "symbol": {
+          "type": "string",
+          "pattern": "^[A-Za-z][A-Za-z0-9_]{0,31}$"
+        },
+        "stage": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 12
+        },
+        "information_set": {
+          "type": "string",
+          "pattern": "^[A-Za-z][A-Za-z0-9_]{0,31}$"
+        }
+      }
+    },
+    "information_set": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "player",
+        "stage",
+        "observes"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[A-Za-z][A-Za-z0-9_]{0,31}$"
+        },
+        "player": {
+          "type": "string",
+          "pattern": "^[A-Za-z][A-Za-z0-9_]{0,31}$"
+        },
+        "stage": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 12
+        },
+        "observes": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Za-z][A-Za-z0-9_]{0,31}$"
+          },
+          "minItems": 0,
+          "maxItems": 64
+        }
+      }
+    },
+    "signal": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "id",
+            "kind",
+            "decision_id",
+            "available_stage"
+          ],
+          "properties": {
+            "id": {
+              "type": "string",
+              "pattern": "^[A-Za-z][A-Za-z0-9_]{0,31}$"
+            },
+            "kind": {
+              "const": "decision"
+            },
+            "decision_id": {
+              "type": "string",
+              "pattern": "^[A-Za-z][A-Za-z0-9_]{0,31}$"
+            },
+            "available_stage": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 12
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "id",
+            "kind",
+            "symbol",
+            "available_stage"
+          ],
+          "properties": {
+            "id": {
+              "type": "string",
+              "pattern": "^[A-Za-z][A-Za-z0-9_]{0,31}$"
+            },
+            "kind": {
+              "const": "state"
+            },
+            "symbol": {
+              "type": "string",
+              "pattern": "^[A-Za-z][A-Za-z0-9_]{0,31}$"
+            },
+            "available_stage": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 12
+            }
+          }
+        }
+      ]
+    },
+    "constraint": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "lhs",
+        "relation",
+        "rhs"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[A-Za-z][A-Za-z0-9_]{0,31}$"
+        },
+        "lhs": {
+          "$ref": "#/$defs/expr"
+        },
+        "relation": {
+          "enum": [
+            "lt",
+            "le",
+            "eq",
+            "ge",
+            "gt"
+          ]
+        },
+        "rhs": {
+          "$ref": "#/$defs/expr"
+        }
+      }
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "note",
+        "file_sha256",
+        "page"
+      ],
+      "properties": {
+        "kind": {
+          "enum": [
+            "synthetic",
+            "manual",
+            "paper_anchor"
+          ]
+        },
+        "note": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "file_sha256": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            }
+          ]
+        },
+        "page": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 2000
+            }
+          ]
+        }
+      }
+    }
+  },
+  "x-audit-limits": {
+    "max_json_bytes": 65536,
+    "max_expr_nodes": 512,
+    "max_expr_depth": 24,
+    "max_total_symbols": 64,
+    "max_stage_count": 12,
+    "numeric_encoding": "bounded decimal strings; exact conversion via decimal.Decimal",
+    "operators": [
+      "const",
+      "symbol",
+      "neg",
+      "add",
+      "mul",
+      "sub",
+      "div",
+      "pow"
+    ]
+  }
+}

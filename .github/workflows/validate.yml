@@ -1,4 +1,4 @@
-name: Offline Research CI (hash-locked PDFs)
+name: Offline Research CI (Phase 3 model contracts)
 
 on:
   pull_request:
@@ -43,6 +43,8 @@ jobs:
           emr inspect
           emr validate
           emr plan --type analytical_game --description 'Synthetic research question'
+          emr model validate tests/fixtures/phase3/stackelberg_synthetic.json
+          emr model tasks tests/fixtures/phase3/stackelberg_synthetic.json
       - name: Verify wheel bundles all schemas
         run: |
           python -m pip wheel --no-deps --no-build-isolation -w /tmp/emr_wheel .
@@ -57,6 +59,7 @@ jobs:
                   "research-state.schema.json",
                   "paper-record.schema.json",
                   "literature-matrix.schema.json",
+                  "model-spec.schema.json",
               ):
                   assert f"emr/schemas/{name}" in names
           PYCODE

@@ -1,0 +1,158 @@
+{
+  "schema_version": "1",
+  "dsl_version": "1",
+  "model_id": "omega_2025_structural_taxonomy",
+  "time": {
+    "kind": "discrete",
+    "stages": 2
+  },
+  "symbols": [
+    {
+      "name": "format",
+      "role": "control",
+      "quantity_type": "general",
+      "unit": {},
+      "domain": {
+        "type": "interval",
+        "lower": "0",
+        "upper": "1",
+        "lower_closed": true,
+        "upper_closed": false
+      },
+      "stochastic": false,
+      "distribution_status": "NOT_APPLICABLE"
+    },
+    {
+      "name": "effort",
+      "role": "control",
+      "quantity_type": "effort",
+      "unit": {},
+      "domain": {
+        "type": "interval",
+        "lower": "0",
+        "upper": "10",
+        "lower_closed": true,
+        "upper_closed": false
+      },
+      "stochastic": false,
+      "distribution_status": "NOT_APPLICABLE"
+    },
+    {
+      "name": "supply",
+      "role": "state",
+      "quantity_type": "probability",
+      "unit": {},
+      "domain": {
+        "type": "interval",
+        "lower": "0",
+        "upper": "1",
+        "lower_closed": true,
+        "upper_closed": false
+      },
+      "stochastic": true,
+      "distribution_status": "UNSPECIFIED"
+    },
+    {
+      "name": "alpha",
+      "role": "parameter",
+      "quantity_type": "general",
+      "unit": {},
+      "domain": {
+        "type": "interval",
+        "lower": "0",
+        "upper": "2",
+        "lower_closed": true,
+        "upper_closed": false
+      },
+      "stochastic": false,
+      "distribution_status": "NOT_APPLICABLE"
+    }
+  ],
+  "players": [
+    {
+      "id": "platform",
+      "objective": {
+        "op": "mul",
+        "args": [
+          {
+            "op": "symbol",
+            "name": "alpha"
+          },
+          {
+            "op": "symbol",
+            "name": "format"
+          }
+        ]
+      }
+    },
+    {
+      "id": "streamer",
+      "objective": {
+        "op": "mul",
+        "args": [
+          {
+            "op": "symbol",
+            "name": "supply"
+          },
+          {
+            "op": "symbol",
+            "name": "effort"
+          }
+        ]
+      }
+    }
+  ],
+  "decisions": [
+    {
+      "id": "format_choice",
+      "player": "platform",
+      "symbol": "format",
+      "stage": 1,
+      "information_set": "format_info"
+    },
+    {
+      "id": "effort_choice",
+      "player": "streamer",
+      "symbol": "effort",
+      "stage": 2,
+      "information_set": "effort_info"
+    }
+  ],
+  "information_sets": [
+    {
+      "id": "format_info",
+      "player": "platform",
+      "stage": 1,
+      "observes": []
+    },
+    {
+      "id": "effort_info",
+      "player": "streamer",
+      "stage": 2,
+      "observes": [
+        "format_public"
+      ]
+    }
+  ],
+  "signals": [
+    {
+      "id": "format_public",
+      "kind": "decision",
+      "decision_id": "format_choice",
+      "available_stage": 2
+    },
+    {
+      "id": "supply_public",
+      "kind": "state",
+      "symbol": "supply",
+      "available_stage": 2
+    }
+  ],
+  "constraints": [],
+  "source": {
+    "kind": "manual",
+    "note": "Taxonomy-only synthetic toy; inspired by Omega (2025), DOI 10.1016/j.omega.2025.103276; not claimed exact paper timing/payoffs.",
+    "file_sha256": null,
+    "page": null
+  }
+}
