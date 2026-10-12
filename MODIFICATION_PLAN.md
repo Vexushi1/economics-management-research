@@ -1,13 +1,13 @@
 # Economics & Management Research — 深度整合与实施蓝图
 
 > **文档属性**：Planning Only / RFC（拟议架构，未经执行验收）  
-> **文档版本**：Reviewed Draft v0.2（静态全量审查修订；非运行验收）  
+> **文档版本**：Reviewed Draft v0.3（独立二次审计修订；非运行验收）  
 > **编制日期**：2026-10-12  
 > **目标仓库**：[Vexushi1/economics-management-research](https://github.com/Vexushi1/economics-management-research)  
-> **预期入库路径**：`MODIFICATION_PLAN.md`（仓库根目录）  
-> **当前交付状态**：本文件已完成本地静态审查，拟上传 GitHub 仓库根目录；实际上传是否成功以 GitHub 返回的 Commit SHA 和文件读回为准。
-> **上传授权**：用户已于 2026-10-12 明确批准**仅为新建/上传本计划文档**产生一次必要的 GitHub Commit；不授权修改任何其他文件、执行后续 Phase 或创建 PR。  
-> **后续工程执行授权**：**没有**。除仅本 Markdown 文件的上传外，本文中的命令、路径、代码、删除和 PR 均为后续拟议事项，不代表已经执行或获准执行。
+> **当前入库路径**：`MODIFICATION_PLAN.md`（仓库根目录）  
+> **已确认远程基线**：初始文件已于 2026-10-12 上传 `main`，基线 Commit `44d0d3f7d68b64e5fb57399dab03faa3cfee0ef8`，原 Blob `f3cf7259f08899208e7eef90fff40649f53982a7`；此处仅为本轮审查开始时的历史快照，修订提交后以远程 HEAD 为准。  
+> **授权范围**：用户批准上传计划并要求最终审查；本轮文档修正只作用于这一个 `MODIFICATION_PLAN.md`。**仍不授权写入任何 Phase 0 业务/管理文件、执行 Phase 1 及后续开发或创建 PR**。  
+> **Phase 0 边界**：仅允许进行 Phase 0A 只读核查；Phase 0B 的审查文档入库属于独立后续写入，须明确授权。
 
 ---
 
@@ -15,14 +15,14 @@
 
 ### 0.1 基线事实（已只读核验）
 
-- 目标仓库为 **Public**，默认分支 `main`，GitHub 仓库元数据 `size=0`；对根目录 Contents API 的读取返回 `This repository is empty`。因此：**本项目当前不是已有代码的重构，而是空仓库的分阶段初始化与第三方技能适配**。不能声称现有业务代码存在缺陷，也不能声称现有项目中存在某个接口、配置或测试。
+- **初次审查时**目标仓库是 `size=0` 的空仓库（历史事实）；**当前**仓库为 Public、默认分支 `main`，只包含 `MODIFICATION_PLAN.md`，且已核对目录 Contents API。当前仍**没有业务代码、接口、运行配置或测试**，因此是“仅文档仓库的分阶段初始化”，不是既有业务代码重构。后续执行前再次获取 HEAD，不能沿用历史空仓库状态。
 - 已通过 GitHub 只读接口核对关键上游仓库、入口 `SKILL.md`、若干 `references/`、`prompts/`、模型库、工具/脚本与许可文本；**尚未下载整库、执行第三方脚本、安装依赖或做端到端测试**。
 - 本 RFC 的接口名称、Schema、目录路径、入口命令等，是**拟定的新项目规范**；凡涉及实际运行环境、包兼容性、API 授权及预期数学结果尚待实测的部分，一律标 `[需要进一步确认]`。
 - 本项目所需论文范式至少覆盖：解析型 Stackelberg/Nash/Hotelling、委托代理与合同协调、动态/微分博弈、随机供给及库存优化、计量实证、理论与实证结合。以上是从用户给出的 2021—2026 年直播电商论文中提炼的**需求范畴**，不是宣称已有论文已被机器复现。
 
 ### 0.2 当前不可触碰的边界
 
-- 本轮仅允许**一个用于本计划 Markdown 文件的 GitHub Commit**（用户已明确授权）；仍禁止 PR、另建分支、其他代码/配置/文档写入或其他 Commit。
+- 本轮仅允许对**同一份** `MODIFICATION_PLAN.md` 做受审计驱动的文档纠错及必要 GitHub 更新；**禁止新增其它文件、修改业务代码/配置、创建 PR 或分支**。既有单次初始化 Commit 为历史事实，不再被表述为仍待执行。
 - 后续实施必须由用户单独授权；本 RFC 不构成实施授权。
 - 对上游项目，仅作只读研究；不得因为“公开可克隆”就删除版权、许可证或作者署名。
 - 学术原始 PDF、未公开稿件、企业微观数据与凭据不得无授权上传 GitHub 或第三方服务。
@@ -42,7 +42,7 @@
 
 ### 1.1 现状与现实问题
 
-由于目标仓库为空，目前**不存在**可评估的既有业务代码、接口、配置与向后兼容性；需要解决的是设计层面风险：
+由于目标仓库**目前只有本计划文档、没有任何业务代码**，仍不存在可评估的既有业务接口、配置与运行时兼容性；需要解决的是设计层面风险：
 
 1. 多个开源仓库都能做文献或写作，若整库导入，会发生命令重名、重复检索、不同输出字段冲突、重复调用大模型。
 2. pAI-Econ、solving-model、Theorist Toolbox 的产物不同：经济学研究假设/证明草图/独立证明审查不能直接互相替代。
@@ -144,7 +144,7 @@
 - **单一写入所有者**：理论假设由 model-design 管理；推导由 solver 管理；审查者只出审查报告，不暗中改写结论；写作模块只引用核验后的结论。
 - **人工确认**：选题与模型假设基线批准、外部传输或高成本执行、投稿正式交付须用户批准；普通符号推导无需逐式停顿。
 
-### 3.2 拟新增目录树（当前均不存在，按各 Phase 文件表自动汇总）
+### 3.2 目标目录树（除现有 `MODIFICATION_PLAN.md` 外均为拟新增；按各 Phase 文件表汇总）
 
 ```text
 .github/
@@ -288,7 +288,7 @@ README.md
 pyproject.toml
 ```
 
-注意：此树是**拟议文件变更清单**，不是读取到的真实文件。所有接口定义见下一节；路径可依据后续初步 PoC 调整，并在变更记录中说明。[需要进一步确认] Agent Skills 的运行宿主（ChatGPT/Codex/Claude/本地 CLI）及平台细节；第一版以纯 Markdown + Python 可测试模块为最低公分母。
+注意：除 `MODIFICATION_PLAN.md` 已在仓库根目录，其余均为**拟议文件变更清单**，不是读取到的现有文件。所有接口定义见下一节；路径可依据后续初步 PoC 调整，并在变更记录中说明。[需要进一步确认] Agent Skills 的运行宿主（ChatGPT/Codex/Claude/本地 CLI）及平台细节；第一版以纯 Markdown + Python 可测试模块为最低公分母。
 
 ### 3.3 跨模块接口（拟议规范，不代表已存在）
 
@@ -308,7 +308,7 @@ class ResearchRequest:
 # def route_request(request: ResearchRequest, registry: "SkillRegistry") -> "ExecutionPlan": ...
 ```
 
-**每个 Skill 使用一致的 frontmatter**：`name`、`description`、`input_artifacts`、`output_artifacts`、`required_tools`、`optional_tools`、`safety_notes`、`compatible_research_types`。`required_tools` 为逻辑工具能力而非指定品牌 CLI；如 `symbolic.algebra`。
+**每个 Skill 的跨宿主 frontmatter 最小公共字段**：`name`、`description`。`input_artifacts`、`output_artifacts`、`required_tools`、`optional_tools`、`safety_notes`、`compatible_research_types` 属于本仓扩展元数据，优先存放在独立的版本化注册表，或在经宿主兼容性验证后放入受支持的 `metadata` 字段；**不得假定所有 Codex/Claude/其它宿主都接受顶层自定义 YAML 字段**。`required_tools` 为抽象能力如 `symbolic.algebra`，而非指定品牌 CLI。
 
 **模型输入（示例）**：
 
@@ -340,7 +340,7 @@ source_refs: []
 @dataclass(frozen=True)
 class SolveResult:
     model_id: str
-    solution_status: str    # CANDIDATE_STATIONARY_POINT | EQUILIBRIUM_CHECKED | MULTIPLE_EQUILIBRIA | INFEASIBLE | UNRESOLVED
+    solution_status: str    # CANDIDATE_STATIONARY_POINT | EQUILIBRIUM_CHECKED | MULTIPLE_EQUILIBRIA | INFEASIBLE | UNSUPPORTED | UNRESOLVED
     solution_method: str    # SYMBOLIC | NUMERICAL | HYBRID | NOT_RUN（不同于验证/证明状态）
     equilibria: tuple[dict, ...]
     parameter_conditions: tuple[str, ...]
@@ -354,22 +354,26 @@ class SolveResult:
 
 ### 3.4 研究状态及证据分类
 
-- 项目状态：`IDEA / LITERATURE_SCREENED / MODEL_SPECIFIED / MODEL_APPROVED / DERIVED / VERIFIED / WRITING / READY_FOR_REVIEW / SUBMISSION_READY`；并行子任务可单独推进。
+- 项目研究进度：`IDEA / LITERATURE_SCREENED / MODEL_SPECIFIED / MODEL_APPROVED / DERIVED / VERIFIED / WRITING / READY_FOR_REVIEW / SUBMISSION_READY`；并行子任务可单独推进。此枚举**不得替代**独立工件有效性。
+- 工件生命周期：`DRAFT / APPROVED / STALE / REVOKED / ARCHIVED`，由版本与依赖变化触发；`STALE` 不是“数学证明为假”，而是当前结果不再对应最新有效输入。后续 `artifacts.py`/`research-state.schema.json` 须分别实现两条状态轴。
 - 证明状态：`UNEXAMINED / SKETCH / NUMERICALLY_SUPPORTED / PROVED_WITH_STATED_ASSUMPTIONS / FORMALLY_CHECKED / REFUTED / UNRESOLVED`。
-- 引用状态：`METADATA_UNVERIFIED / METADATA_VERIFIED / CLAIM_SUPPORTED / CLAIM_UNSUPPORTED / INACCESSIBLE`。
+- 引用元数据状态：`METADATA_UNVERIFIED / METADATA_VERIFIED / METADATA_INACCESSIBLE`；**独立**论断支持状态：`NOT_VERIFIED / CLAIM_SUPPORTED / CLAIM_UNSUPPORTED / INACCESSIBLE`。单篇 DOI 验证成功不得给与它关联的所有论断自动打上支持标签。PDF 提取状态另设 `READABLE / PARTIAL / UNREADABLE`。
 - 复现状态：按模型、均衡、命题、表格、图分别存 `MATCH / PARTIAL / MISMATCH / NOT_RUN / UNREPRODUCIBLE_INPUT`。
+- 求解可用性：`UNSUPPORTED` 表示能力未实现或工具不支持；它不同于数学上已证明的 `INFEASIBLE`。求解器返回 `EQUILIBRIUM_CHECKED` 仍须带验证范围、是否仅数值局部检查及均衡选择规则，不能单独表示严格全域成立。
 - **状态单向证据约束**：`NUMERICALLY_SUPPORTED` 不自动升级为 `PROVED_WITH_STATED_ASSUMPTIONS`；AI 多轮一致不自动升级为 `FORMALLY_CHECKED`。
 
 ---
 ## 4. 分阶段实施路径与逐文件变更清单
 
-> 所有下述路径在当前目标空仓库中都是**拟新增**文件。`M` 表示未来实施阶段可能修改此前阶段建立的文件；`D` 表示可能移除过时文件。**当前阶段无实际 `M`、`D`、PR、Commit 或执行操作。** 后续阶段并非一次性批准；每一阶段须以独立范围验收。建议将每阶段作为独立开发变更单，分支/PR 操作仅在用户未来解除禁令后讨论。
+> 除根目录已有的 `MODIFICATION_PLAN.md` 外，下述路径均为后续**拟新增**文件。`M` 表示未来实施阶段可能修改此前阶段建立的文件；`D` 表示可能移除过时文件。**尚未进行任何 Phase 0—9 的工程文件改动**；本文件的初始化/审计修订提交不应冒充开发阶段 Commit。阶段验收必须单独确认，分支/PR 仅在明确授权后执行。
 
-### Phase 0 — 来源、许可与运行环境审查（只读准备）
+### Phase 0 — 来源、许可与运行环境审查（0A 只读核查；0B 文档落地）
 
 **目标**：消除“不知道 Skill 可否合法复用、环境是否可调用”的不确定性；不编写业务逻辑。
 
-**建议文件：**
+**子阶段边界**：`0A READ_ONLY`：查 GitHub HEAD/许可证、检查上游 SKILL 与 scripts、记录环境能力，不产生 GitHub 写入；`0B DOCUMENTATION`：在授权后提交下面四份审计文档。**本轮最多启动 0A，不能把 0B 写入视为已获授权。**
+
+**建议文件（全部属于 0B；不可在 0A 中提交）：**
 
 | 操作 | 拟议路径 | 文件内部需包含的内容 |
 |---|---|---|
@@ -383,16 +387,18 @@ class SolveResult:
 - 0.1 对每个计划复用的源文件固定上游 SHA 和许可证；**没有清晰授权则不得计划直接复制文件**。
 - 0.2 分类 `prompt-only / script-backed / external-service / library-wrapper`；记录入口与 `scripts/`、`references/` 的路径依赖。
 - 0.3 检查上游是否包含硬编码 `~/.claude/...`、`oracle`、固定模型名、绝对路径和外部网络请求；逐项标记适配策略。
-- 0.4 确认部署环境：支持的 Python 版本、Codex Skills 目录行为、是否存在本地 shell、LaTeX、联网 API（均 `[需要进一步确认]`）。
+- 0.4 确认部署环境：支持的 Python 版本、Codex Skills 目录行为、是否存在本地 shell、LaTeX、联网 API（均 `[需要进一步确认]`）；**当前 ChatGPT 工具能力不等同于最终目标 Codex/本地安装能力，不得把一处运行验证推广到其它宿主**。
 - 0.5 明确后续是否商业化、公开再分发形式及默认许可证（用户决策）。
 
-**验收**：核心来源均有明确 `adopt/adapt/reference-only/defer` 结论，未解决的许可/可用性项显式阻断相应复制任务；禁止自动执行外部来源代码。
+**0A 验收**：GitHub 目标 HEAD 与至少三套核心上游 SHA/许可证/目录依赖得到只读核查记录；环境无法观察的项目明确标 `UNKNOWN`，禁止自动执行上游脚本。
 
-**回滚**：仅是文档；不进入运行时依赖，无行为回滚。
+**0B 验收**：四份审计文档在另行授权后落地，核心来源各有 `adopt/adapt/reference-only/defer` 结论；未解决的许可项显式阻断相应复制任务。Phase 0 完整通过应以 0A + 0B 为前提。
+
+**回滚**：Phase 0A 为只读，无需回滚；Phase 0B 文档若需更正，保留历史、只修订受影响文件，不擅删许可证记录。
 
 ### Phase 1 — 仓库最小基础与可运行契约
 
-**目标**：空仓库初始化为结构清晰、无外部付费依赖、能做静态验证的科研 Skills 框架。
+**目标**：将当前仅含计划文档的仓库初始化为结构清晰、无外部付费依赖、能做静态验证的科研 Skills 框架。
 
 **文件变更：**
 
@@ -408,7 +414,7 @@ class SolveResult:
 | A | `src/emr/core/contracts.py` | `ResearchRequest`,`ExecutionPlan`,`ArtifactRef`,`SolveResult`,`VerificationReport` 类型契约 |
 | A | `src/emr/core/registry.py` | `SkillSpec` 注册/查找；拒绝重复 name、未知依赖、循环依赖 |
 | A | `src/emr/core/router.py` | `route_request(request,registry)`，不执行外部命令，只构建可解释 DAG |
-| A | `src/emr/core/artifacts.py` | 原子写入研究工件、校验路径、状态索引；禁止覆盖已批准的记录而不留历史 |
+| A | `src/emr/core/artifacts.py` | 原子写入、路径校验、版本及依赖引用；**Phase 1 即实现最小 `STALE`/`REVOKED` 标记和依赖下游查询**，防止 Phase 3—8 依赖不存在的失效机制；Phase 9 再优化内容寻址缓存 |
 | A | `src/emr/cli.py` | 拟议 `emr inspect`, `emr plan`, `emr validate`，**不自动访问网络/调用 LLM** |
 | A | `schemas/research-state.schema.json` | 项目阶段、工件引用、批准状态、变更事件、Schema 版本 |
 | A | `.github/workflows/validate.yml` | 未来 CI：静态 Skill frontmatter、Schema、快速单元测试；只执行受信任的本仓代码 |
@@ -463,7 +469,7 @@ class SolveResult:
 
 ### Phase 3 — 经济模型设计与研究类型路由
 
-**目标**：完成严谨的模型事实契约，把 pAI-Econ 理论谱系转为可检查的输入，而不是生成任意可读段落后立即求解。
+**目标**：完成严谨的模型事实契约，把 pAI-Econ 理论谱系转为可检查的输入，而不是生成任意可读段落后立即求解。所有符号表达式须采用**有限运算符白名单的 AST/DSL**或受约束的结构化表示，禁止将不可信 PDF/LLM 文本直接传入 Python `eval`、`exec` 或无安全审计的动态 `sympify` 字符串解析器。
 
 **文件变更：**
 
@@ -474,10 +480,10 @@ class SolveResult:
 | A | `references/economic-model-library/stackelberg.md` | 策略空间、跟随者反应与领导者最优；无默认唯一均衡假设 |
 | A | `references/economic-model-library/platform-hotelling.md` | 双边加入、网络效应、效用和参与约束 |
 | A | `references/economic-model-library/principal-agent.md` | Hidden Action/Type；IR/IC、可观察与不可观察信息 |
-| A | `schemas/model-spec.schema.json` | 状态变量/控制变量/玩家/顺序/信息集/约束/单位/来源及假设审计 |
+| A | `schemas/model-spec.schema.json` | 状态/控制变量、玩家、顺序、信息集、约束、量纲和来源；**表达式 AST/DSL 版本、白名单运算符、符号表、域、输入大小限制**，拒绝任意代码片段 |
 | A | `src/emr/domain/game.py` | `validate_game_spec`, `check_information_sequence`, `build_best_response_tasks` 的领域规则 |
 | M | `src/emr/core/router.py` | 根据 `research_type` 加载 analytical_game/stochastic/empirical/hybrid 分支 |
-| A | `tests/unit/test_game_spec.py` | 漏掉目标函数、负定参数域、行动者与顺序不一致应失败 |
+| A | `tests/unit/test_game_spec.py` | 漏目标函数、错误变量域、行动者与顺序不一致及含危险表达式的模型输入应失败；参数限制缺失可 BLOCKED 而非擅定方向 |
 | A | `tests/unit/test_information_sequence.py` | 检测未来状态被前期决策者直接观察的时间逻辑错误 |
 
 **必须实现的模型合理性检查**：
@@ -488,7 +494,7 @@ class SolveResult:
 - 参数外生/内生划分，边界值是否改变模型形式。
 - 创新性论述由文献证据驱动，**不能“多一个变量”就自动宣称贡献**。
 
-**验收**：从已知的静态 Stackelberg 示例能生成完整 `model-spec` 并拒绝缺失信息集的模型；能把 2025 Omega 的随机供给类问题标记为随机序贯博弈而非连续时间 HJB。
+**验收**：从已知静态 Stackelberg 示例生成完整 `model-spec` 并拒绝缺失信息集、恶意表达式及缺少关键参数域的输入；能把 2025 Omega 的随机供给类问题标为随机序贯博弈而非连续时间 HJB。
 
 **回滚**：模型版本变更时将依赖它的求解、命题和图表标失效（`STALE`），保留原模型快照，不触发全局文献重查。
 
@@ -502,7 +508,7 @@ class SolveResult:
 |---|---|---|
 | A | `skills/game-equilibrium/SKILL.md` | 跟随者→领导者逆向归纳；解析/数值/无法求解分支；要求证据与边界比较 |
 | A | `skills/contract-mechanism/SKILL.md` | 佣金、固定费、成本补贴、风险分担、净销售额合同及 IR/IC/协调定义 |
-| A | `src/emr/adapters/symbolic_sympy.py` | `differentiate`, `solve_foc`, `simplify_identity`, `substitute`, `hessian`；精确有理数及明确假设 |
+| A | `src/emr/adapters/symbolic_sympy.py` | `differentiate`, `solve_foc`, `simplify_identity`, `substitute`, `hessian`；精确有理数及明确假设；**仅接收已校验的 AST/内部表达式对象**，禁止未经授权解释字符串为 Python 代码 |
 | A | `src/emr/adapters/numerical_scipy.py` | `optimize_constrained`, `find_roots`, `evaluate_residuals`, `parameter_grid`；记录容差和初值 |
 | A | `src/emr/domain/contract.py` | `verify_individual_rationality`, `verify_incentive_compatibility`, `test_coordination` |
 | A | `schemas/equilibrium-result.schema.json` | 均衡对象、策略域、参数条件、最优性证据、多解/边界标记 |
@@ -523,7 +529,7 @@ class SolveResult:
 6. 合同协调至少明确“决策匹配集中最优”和“系统利润达到集中最优”的区别；双赢另外检查各方参与约束。
 7. 若无闭式解，返回可复现数值求解路径及失败状态，不伪造解析式。
 
-**验收**：在一个已知线性 Stackelberg 案例上与手推闭式解一致，检验参数域和边界；在合同示例中构造一个违反 IR 的方案并确认被拒绝；同一参数值使用双重求解路径结果一致（在容差内）。
+**验收**：至少使用**两类**合成 Stackelberg 测试：(1) 手推闭式解与边界、凹性核对；(2) 能让 follower 的反应**改变 leader 最优决策**的战略反馈案例。一个只让 leader 的利润倍乘而最优价格不变的案例不足以单独覆盖 (2)。另需在合同示例中构造违反 IR 的方案并确认被拒绝；同一参数值使用双重求解路径结果一致（在容差内）。
 
 **回滚**：采用功能开关 `experimental_solver`；出错时切换为仅符号/人工推导报告，不允许“静默采用无验证数值答案”。
 
@@ -793,6 +799,8 @@ p^*=\frac{A+bw}{2b},\qquad
 1. `e<0` 的候选解应被可行域拒绝。
 2. 将佣金参与约束移除后“协调”结论可能不再双方接受，合同模块应分开报告系统效率与个体利益。
 
+**补充战略反馈回归例（与上方基础例不同）**：令跟随者利润 `Π_F=a·p·e−(c/2)e²`，领导者利润 `Π_L=(p−w)(A−bp+γe)`，约束 `p∈[w,A/b]`、`e≥0`。当 `A=10,b=1,w=2,a=c=1,γ=1/5` 时，最优跟随者努力为 `e^*(p)=p`，领导者最优价格为 `p^*=29/4`、努力 `e^*=29/4`，且领导者目标二阶导数 `−8/5<0`；若 `γ=0` 则价格为 `6`。这可检验求解器确实将领导者的最优决策与跟随者反应联系起来。该例仅在上述参数与域内充当固定测试真值；**不代表任意参数下都具有内部最优解**。
+
 ### 6.3 论文级验收阶梯
 
 - **A0 静态技能加载**：Skill frontmatter、引用路径、Schema 能读取，外部依赖可声明未安装。
@@ -815,11 +823,14 @@ p^*=\frac{A+bw}{2b},\qquad
 | G5 计算复现 | 代码、版本、参数 | 实际运行数据与论文报告一致 | 未运行却宣称复现；选择性遗漏反例 |
 | G6 投稿审查 | manuscript + citation | 论断证据、章节、图表、目标格式一致 | 引文不支持结论、结果状态过期 |
 
+**研究范式适配规则**：`G4` 面向理论命题/均衡；对纯实证研究，以识别假设、估计量和推断审查的 `G4E` 代替，不能要求其证明不存在的博弈定理。`G5` 对包含数值/实证/图表结论的工作强制核验；对真正无计算结果的纯理论文章，需记录 `NOT_APPLICABLE` 与依据，**不能把跳过称为 PASS**。混合研究两类门均适用。
+
 **失败处理的状态规则**：
 
 - `PASS`：符合本 Gate 严格定义的适用范围。
 - `CONDITIONAL`：仅非关键事项待补；重要数学命题不得以此绕过 G4。
 - `BLOCKED`：需要信息或环境，不能得出通过/失败。
+- `NOT_APPLICABLE`：研究设计经确认不适用该 Gate；保留理由及批准记录，不计为 PASS。
 - `FAIL`：已经有反例、矛盾或严重缺口。
 
 任何新证据可使之前 `PASS` 被撤回；记录撤回原因和影响依赖，不能删除审查历史。
@@ -854,7 +865,7 @@ research-question ────────────────────�
 
 - 缓存键建议包括 `sha256(inputs + schema_version + skill_version + code_commit + environment_fingerprint + parameter_config)`。
 - 网络检索附日期和来源快照；文献检索结果有时效性，不允许永久沿用而不提示。
-- 修改 `model-spec` 触发相应 `equilibrium-result`, `proof-report`, `replication-report`, `manuscript` 失效，不触发无关文献 PDF 重解析。
+- 修改 `model-spec` 触发相应 `equilibrium-result`, `proof-report`, `replication-report`, `manuscript` 失效，不触发无关文献 PDF 重解析；**最小失效/状态标记在 Phase 1 `artifacts.py` 就应可用**，Phase 9 的 `cache.py` 仅优化复用和性能。
 - 只修改文稿语言风格时不触发均衡/证明/数值重跑。
 - 执行脚本需幂等；每个节点写自己的产物目录，新实验不覆盖最后一次已批准版本。
 - 每次失败保存异常、输入哈希、调用来源、日志和已有产物；重试失败节点及依赖子图，**不得默认从 Stage 1 全量重启**。
@@ -878,7 +889,7 @@ research-question ────────────────────�
 
 ### 8.1 开发准入条件
 
-- 当前用户仅授权本 RFC 文件的必要 GitHub 上传 Commit；以后每次实际工程执行仍须用户批准**明确的阶段范围**。
+- 当前用户仅授权本 RFC **同一文件的创建与审计纠错**；以后每次 Phase 0B 或实际工程执行仍须用户批准**明确的写入范围**。Phase 0A 只读核查可先行。
 - 任务实施前核对目标仓库 HEAD、目录、已存在文件、相应上游 SHA 与许可证；本计划中的拟议路径不能当作事实。
 - 若发现目标仓库已不为空，**优先做真实差异审查**，本 RFC 中的 `A` 应重新分类为 `A/M/skip`，不能覆盖现有内容。
 - 每个开发任务有文件列表、成功标准、测试命令、影响范围、回滚办法。
@@ -923,7 +934,7 @@ research-question ────────────────────�
 
 | ID | 待确认事项 | 当前状态 | 阻断范围 |
 |---|---|---|---|
-| Q01 | GitHub 计划文件能否允许**唯一一次、仅包含计划文件的 Commit**？ | **已确认**：用户于 2026-10-12 明确批准；仅授权本文件创建操作 | 仅本 RFC 上传，不代表后续工程授权 |
+| Q01 | GitHub 是否已收到本计划文件，后续文档纠错范围是什么？ | **已确认**：初始上传 Commit `44d0d3f7…`；当前仅允许本文件审计修订，不代表后续 Phase 授权 | 非计划文档写入均不得执行 |
 | Q02 | 本仓自有代码采用 MIT、Apache-2.0 还是其它许可证？ | `[需要进一步确认]` | `LICENSE` 与复用说明 |
 | Q03 | 是否允许未来公开衍生第三方 Skills，是否涉及商业用途？ | `[需要进一步确认]` | CC BY-NC 内容复制、缺许可模块 |
 | Q04 | 首选运行平台是 Codex CLI、桌面 Codex、ChatGPT Work、Claude 还是本地 Python？ | `[需要进一步确认]` | Skill 目录与执行适配 |
@@ -942,7 +953,7 @@ research-question ────────────────────�
 
 当前最具价值的风险不是“有没有足够多的 Skill”，而是**能否将真实模型正确还原成数学事实，再证明与复现**。一次性引入数十个技能会放大目录冲突、权限、许可及测试成本。因此建议：
 
-- **MVP-1**：完成 Phase 0—1，入口可加载，研究工件可校验，无外部模型强依赖。
+- **MVP-1**：先完成 Phase 0A 只读检查，0B 审计文档落地经授权后完成，再执行 Phase 1；入口可加载，研究工件可校验，无外部模型强依赖。
 - **MVP-2**：完成 Phase 2—3，能精读 PDF、形成文献矩阵与完整模型事实。
 - **MVP-3**：完成 Phase 4—5，一个小型 Stackelberg + IR/IC 测试 + 一个可自动发现的错误命题。
 - **MVP-4**：完成 Phase 6 部分，将 MDE、Omega 分项复现，并生成残差及差异报告。
@@ -984,16 +995,29 @@ research-question ────────────────────�
 
 ## 12. 全量静态审查记录（不等于软件测试）
 
+### 12.1 2026-10-12 第二轮独立审计（v0.3）
+
+- **核实仓库**：初始空仓库叙述已修为“目前仅存在 `MODIFICATION_PLAN.md`”；GitHub Contents API 读取确认根目录只有该文件，三套核心上游的 HEAD 与 v0.2 计划记录一致。文档中的 Commit SHA 用作**审查开始时的历史基线**，不应声称自动等于以后 HEAD。
+- **修正边界矛盾**：Phase 0 分为 `0A` 只读核查、`0B` 审计文档落地。后者虽不写业务代码，但也是 GitHub 写入，必须与 0A 区分并按授权执行。
+- **修正状态契约**：新增独立工件生命周期及 `STALE`；增加 `UNSUPPORTED` 能力状态与 `UNREADABLE`/`NOT_VERIFIED` 的所属分类，避免代码阶段因不一致枚举而失效。
+- **修正时序依赖**：Phase 1 增加最小工件依赖失效机制，Phase 9 才引入缓存性能优化；避免 Phase 3—8 使用尚未实现的失效能力。
+- **修正输入安全**：新增模型表达式的 AST/DSL 白名单契约，禁止 PDF/LLM 生成的未经审查字符串直接触发 Python 解释器。
+- **加强数学回归**：旧合成 Stackelberg 案例公式经独立符号复核属实，但 `p^*` 不随 `γ` 变化；新增独立的战略反馈案例，检验改变努力激励确实改变领导者最优价格。
+- **质量门分支**：增加纯实证 `G4E` 和无计算研究 `NOT_APPLICABLE`，防止把理论证明 Gate 强加于所有研究范式。
+- **格式与未决问题**：再次核对全篇围栏、标题、计划路径、上游快照和许可证限定；保留真实未解的环境/合规项目，不以“无发现错误”代替上线验收。
+- **修正现状表述**：将第 1 节和 Phase 1 的“空仓库”措辞更正为“只有规划文件、尚无业务代码”，避免未来在已有计划文件上重复创建。
+- **审计边界**：尚未运行上游第三方 Skills、集成代码或真实论文级复现；“本计划经审查”只表示文档层面与已核查 GitHub 信息相符，不保证未来实现无错误。
+
+
 - 审查维度：目标仓库基线、上游链接和版本、目录树与逐 Phase 路径一致性、模型状态枚举、数学基准真值、阶段依赖、数据与引用审计、许可/敏感数据、风险与回滚、远程上传授权。
-- 静态修正记录：补齐总目录树中的阶段新增路径；分离求解方法和求解状态；修改可手算 Stackelberg 测试，避免跟随者努力与定价脱钩；显式增加动态最优控制分支的最小职责与测试；更新“仅计划文件上传”的一次性批准。
+- v0.2 静态修正记录：补齐总目录树中的阶段新增路径；分离求解方法和求解状态；修改可手算 Stackelberg 测试以体现价格影响努力；增加动态最优控制分支的最小职责与测试。**v0.3 的新修正见 12.1**。
 - 保留限制：没有执行第三方 Skill、计算库、CI、TeX 编译和真实论文复现，也没有检查所有上游子文件；不能宣称不存在任何未知缺陷。高风险与待确认条目仍需在各 Phase 前逐项复核。
 - 文档自身验收：Markdown 格式、代码围栏配对、所有分阶段拟议路径可在总目录树中找到、所有未经实施事项仍为未来态；上传后远程 SHA 与读回正文另行验证。
 
 ## 13. 本轮交付确认（Planning Only）
 
-- **已做**：只读查询目标 GitHub 仓库；只读核对部分上游仓库、Skill 和 LICENSE；在当前会话文件空间撰写这份可审核 RFC。
+- **已做**：GitHub 只读核对目标仓库与部分上游 Skill/LICENSE；已在先前获批范围内创建初始 `MODIFICATION_PLAN.md`，本轮仅审计与修订同一份计划文档。
 - **尚未实施的工程内容**：业务代码和配置修改、PR、分支操作、第三方 Skill 克隆、依赖安装及软件运行测试。本文的上传仅属于经授权的规划文件写入。
-- **当前文件**：`/mnt/data/MODIFICATION_PLAN.md`（本地交付副本；实际 GitHub SHA 以操作结果为准）。
-- **预期入库路径**：`Vexushi1/economics-management-research/MODIFICATION_PLAN.md`；写入后须读回核验，不在事前声称已经存在。
-- **远程写入授权状态**：用户已明确允许仅为上传本 Markdown 创建必要 Commit；本文件的实际远程提交结果需在交付时独立核验。任何其他修改、PR、额外提交依然禁止。
-- **下一步建议**：先审核本 RFC 的 Phase 0—4 及质量门；经同意后单独授权相应工程阶段，不应把本文视作实施许可。
+- **当前文件**：`/mnt/data/MODIFICATION_PLAN.md`（本地副本）；GitHub 路径：`Vexushi1/economics-management-research/MODIFICATION_PLAN.md`，初始上传已读回成功。
+- **文档修订范围**：仅本计划的纠错及审计说明；所有其它文件、分支、PR、业务代码及 Phase 0B 写入仍未执行。
+- **下一步建议**：可以开展 Phase 0A 只读来源和环境核查；0B 文档提交与其它工程变更必须按各阶段授权执行。
