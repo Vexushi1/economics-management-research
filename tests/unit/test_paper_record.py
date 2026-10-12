@@ -5,6 +5,7 @@ from importlib.resources import files
 
 import pytest
 from jsonschema import Draft202012Validator
+from jsonschema.exceptions import ValidationError
 
 from emr.adapters.bibliography import deduplicate_by_doi, lookup_doi, normalize_doi
 from emr.adapters.pdf_extract import extract_pdf
@@ -91,7 +92,7 @@ def test_equation_coordinates_are_required_and_checked(sample_pdf):
     record = paper_record(extract_pdf(sample_pdf))
     item = record["equation_candidates"][0]
     item.pop("bbox")
-    with pytest.raises(Exception):
+    with pytest.raises(ValidationError):
         validate_paper_record(record)
 
     record = paper_record(extract_pdf(sample_pdf))
