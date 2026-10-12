@@ -3,11 +3,12 @@
 import json
 from importlib.resources import files
 
+import pytest
 from jsonschema import Draft202012Validator
 
 from emr.adapters.bibliography import deduplicate_by_doi, lookup_doi, normalize_doi
 from emr.adapters.pdf_extract import extract_pdf
-from emr.core.papers import literature_matrix, paper_record
+from emr.core.papers import literature_matrix, paper_record, validate_paper_record
 
 
 def _schema(file: str):
@@ -51,7 +52,18 @@ def test_doi_dedup_only_when_identifier_exists():
 
 
 def test_online_doi_lookup_disabled():
-    import pytest
-
     with pytest.raises(NotImplementedError):
         lookup_doi("10.1000/test")
+
+
+def test_duplicate_pdf_sha_collapses_without_merging_distinct_versions(sample_pdf):
+    record = paper_record(extract_pdf(sample_pdf))
+    assert len(literature_matrix([record, record])["rows"]) == 1
+
+
+def test_invalid_anchor_sha_not_accepted(sample_pdf):
+    record = paper_record(extract_pdf(sample_pdf))
+    assert record["proposition_candidates"]
+    record["proposition_candidates"][0]["anchor"]["file_sha256"] = "0" * 64
+    with pytest.raises(ValueError, match="source anchor SHA"):
+        validate_paper_record(record)

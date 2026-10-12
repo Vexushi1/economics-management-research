@@ -79,7 +79,12 @@ def _anchor_dict(document: PdfDocument, page: int, block: int, start: int, end: 
 def literature_matrix(records: list[Mapping[str, object]]) -> dict[str, object]:
     """Make an auditable comparison matrix without fabricating economic mechanisms."""
     rows = []
+    seen_sources: set[str] = set()
     for record in records:
+        file_sha = str(record["file_sha256"])
+        if file_sha in seen_sources:
+            continue  # Exact same PDF bytes are one source; keep distinct revisions.
+        seen_sources.add(file_sha)
         title_obj = record.get("title")
         title = title_obj.get("value") if isinstance(title_obj, Mapping) else None
         rows.append({"file_sha256": record["file_sha256"], "title": title, "title_status": "NOT_VERIFIED", "doi_candidates": list(record.get("doi_candidates", [])), "methods": {"value": None, "status": "UNKNOWN"}, "mechanisms": {"value": None, "status": "UNKNOWN"}, "findings": []})
@@ -95,6 +100,16 @@ def validate_paper_record(record: Mapping[str, object]) -> None:
 
     schema = json.loads(files("emr").joinpath("schemas/paper-record.schema.json").read_text())
     Draft202012Validator(schema).validate(record)
+    # JSON Schema checks shape but cannot express cross-field evidence linkage.
+    for field in ("sections", "proposition_candidates", "equation_candidates"):
+        for item in record[field]:
+            anchor = item["anchor"]
+            if anchor["file_sha256"] != record["file_sha256"]:
+                raise ValueError("source anchor SHA mismatches paper record")
+            if anchor["page"] > record["pages"] or anchor["end"] <= anchor["start"]:
+                raise ValueError("source anchor span or page is invalid")
+            if anchor["quote"].strip() != item["text"].strip():
+                raise ValueError("candidate text differs from quoted evidence")
 
 
 def validate_literature_matrix(matrix: Mapping[str, object]) -> None:
