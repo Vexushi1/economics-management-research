@@ -1,0 +1,33 @@
+name: Phase 1 validation
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+# Pull requests are untrusted; no write token or secrets are needed.
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Select Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install offline-runtime dependencies and developer tools
+        run: python -m pip install --disable-pip-version-check -e '.[math,dev]'
+      - name: Static analysis
+        run: python -m ruff check src tests
+      - name: Unit and integration tests
+        run: python -m pytest -q
+      - name: Validate CLI contract
+        run: |
+          emr inspect
+          emr validate
+          emr plan --type analytical_game --description 'Synthetic research question'

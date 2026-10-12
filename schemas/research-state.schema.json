@@ -1,0 +1,37 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Vexushi1/economics-management-research/schemas/research-state.schema.json",
+  "title": "Research state metadata (Phase 1 provisional contract)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "research_type", "artifacts"],
+  "properties": {
+    "schema_version": {"type": "string", "const": "1"},
+    "research_type": {
+      "type": "string",
+      "enum": [
+        "analytical_game",
+        "stochastic_operations",
+        "empirical_econometrics",
+        "hybrid",
+        "replication"
+      ]
+    },
+    "artifacts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["uri", "sha256", "schema_version", "created_by", "created_at", "status"],
+        "properties": {
+          "uri": {"type": "string", "minLength": 1},
+          "sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+          "schema_version": {"type": "string", "minLength": 1},
+          "created_by": {"type": "string", "minLength": 1},
+          "created_at": {"type": "string", "format": "date-time"},
+          "status": {"enum": ["VALID", "STALE", "REVOKED"]}
+        }
+      }
+    }
+  }
+}
