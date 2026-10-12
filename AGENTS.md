@@ -9,3 +9,6 @@
 - Never transmit private manuscripts, data or model details to external services without explicit authorization.
 - Preserve exact source anchors and explicit unknowns. Changes to model facts must mark dependent artifacts stale.
 - When adding code, supply unit tests and rerun the local lint/test suite. No arbitrary shell execution from model strings.
+
+- Main project code is MIT licensed; preserve `third_party/` notices for any future external code.
+- Research states use immutable, Schema-validated JSON snapshots; source PDFs remain untrusted data.

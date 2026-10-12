@@ -4,11 +4,12 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "economics-management-research"
-version = "0.1.0"
+version = "0.1.1"
 description = "Offline-first research workflow contracts for economics and management"
 readme = "README.md"
+license = "MIT"
 requires-python = ">=3.12,<3.13"
-dependencies = []
+dependencies = ["jsonschema==4.26.0"]
 classifiers = [
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.12",
@@ -24,6 +25,9 @@ emr = "emr.cli:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.setuptools.package-data]
+emr = ["schemas/*.json"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

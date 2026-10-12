@@ -1,0 +1,10 @@
+# Phase 1 Python 3.12 CI input constraints. Resolve transitive dependencies
+# from the official index and commit a --generate-hashes lock before final CI.
+# Explicit build tools let the offline package install avoid build isolation.
+setuptools==82.0.1
+wheel==0.45.1
+jsonschema==4.26.0
+sympy==1.14.0
+numpy==2.3.5
+pytest==9.0.2
+ruff==0.13.2

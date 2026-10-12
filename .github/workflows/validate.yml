@@ -1,32 +1,39 @@
-name: Phase 1 validation
+name: Phase 1 consolidation - lock generation and validation
 
 on:
   pull_request:
   push:
     branches: [main]
 
-# Pull requests are untrusted; no write token or secrets are needed.
 permissions:
   contents: read
 
 jobs:
   validate:
     runs-on: ubuntu-24.04
-    timeout-minutes: 15
+    timeout-minutes: 20
     steps:
-      - name: Check out repository
-        uses: actions/checkout@v4
-      - name: Select Python
-        uses: actions/setup-python@v5
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: '3.12'
-      - name: Install offline-runtime dependencies and developer tools
-        run: python -m pip install --disable-pip-version-check -e '.[math,dev]'
+      - name: Resolve Python 3.12 lockfile from declared inputs
+        run: |
+          python -m pip install --disable-pip-version-check uv==0.10.0
+          uv pip compile requirements/ci.in --python-version 3.12 --python-platform x86_64-unknown-linux-gnu --generate-hashes --no-header --output-file requirements/ci-py312-linux.lock
+          echo 'BEGIN_LOCK_B64'
+          base64 -w0 requirements/ci-py312-linux.lock
+          echo
+          echo 'END_LOCK_B64'
+      - name: Install locked dependencies
+        run: python -m pip install --disable-pip-version-check --require-hashes -r requirements/ci-py312-linux.lock
+      - name: Install package without uncontrolled build isolation
+        run: python -m pip install --disable-pip-version-check --no-deps --no-build-isolation -e .
       - name: Static analysis
         run: python -m ruff check src tests
-      - name: Unit and integration tests
+      - name: Tests
         run: python -m pytest -q
-      - name: Validate CLI contract
+      - name: CLI contract smoke
         run: |
           emr inspect
           emr validate
