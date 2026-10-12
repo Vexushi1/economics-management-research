@@ -81,3 +81,23 @@ The expression DSL deliberately rejects complex symbolic denominators,
 unregistered functions, unbounded parser input and continuous-time dynamics
 until separately designed and tested. Input text from PDF/LLM outputs remains
 untrusted and must be manually transcribed into the declared JSON AST.
+
+## Phase 4 — opt-in symbolic and numerical mathematics
+
+The optional `[math]` extra now includes pinned SymPy, NumPy and SciPy. The only
+accepted input to the AST→SymPy compiler is a revalidated Phase 3
+`ValidatedGameSpec`; imported formulas, PDF text and arbitrary Python source
+cannot be evaluated. Formula constructors accept exact bounded decimal nodes.
+
+`emr.domain.equilibrium.solve_experimental` is **disabled by default**. When
+explicitly enabled it certifies only a restricted two-stage, one-control-per-
+player subclass: strictly concave quadratic follower, affine feasible domain,
+global leader payoff polynomial of degree at most two, and follower reaction
+valid on the complete leader interval. It returns `UNRESOLVED` outside that
+scope. A general nonlinear constrained Nash solver is **not** implemented.
+
+A univariate quadratic best-response report checks affine constraints, open/
+closed boundaries, exact FOC, curvature and interval KKT signs. Numerical
+multi-start SciPy reports are `LOCAL_CANDIDATES_ONLY`; they must never be cited
+as formal proofs. Contract coordination, IR, enumerated IC and transfer balance
+are separately checked, not conflated. Synthetic fixtures do not copy papers.

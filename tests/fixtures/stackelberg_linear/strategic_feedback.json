@@ -1,0 +1,346 @@
+{
+  "schema_version": "1",
+  "dsl_version": "1",
+  "model_id": "strategic_feedback_synthetic",
+  "time": {
+    "kind": "discrete",
+    "stages": 2
+  },
+  "symbols": [
+    {
+      "name": "a",
+      "role": "parameter",
+      "quantity_type": "general",
+      "unit": {},
+      "domain": {
+        "type": "interval",
+        "lower": "0",
+        "upper": null,
+        "lower_closed": false,
+        "upper_closed": false
+      },
+      "stochastic": false,
+      "distribution_status": "NOT_APPLICABLE"
+    },
+    {
+      "name": "b",
+      "role": "parameter",
+      "quantity_type": "general",
+      "unit": {},
+      "domain": {
+        "type": "interval",
+        "lower": "0",
+        "upper": null,
+        "lower_closed": false,
+        "upper_closed": false
+      },
+      "stochastic": false,
+      "distribution_status": "NOT_APPLICABLE"
+    },
+    {
+      "name": "c",
+      "role": "parameter",
+      "quantity_type": "general",
+      "unit": {},
+      "domain": {
+        "type": "interval",
+        "lower": "0",
+        "upper": null,
+        "lower_closed": false,
+        "upper_closed": false
+      },
+      "stochastic": false,
+      "distribution_status": "NOT_APPLICABLE"
+    },
+    {
+      "name": "A",
+      "role": "parameter",
+      "quantity_type": "general",
+      "unit": {},
+      "domain": {
+        "type": "interval",
+        "lower": "0",
+        "upper": null,
+        "lower_closed": false,
+        "upper_closed": false
+      },
+      "stochastic": false,
+      "distribution_status": "NOT_APPLICABLE"
+    },
+    {
+      "name": "gamma",
+      "role": "parameter",
+      "quantity_type": "general",
+      "unit": {},
+      "domain": {
+        "type": "interval",
+        "lower": "0",
+        "upper": null,
+        "lower_closed": true,
+        "upper_closed": false
+      },
+      "stochastic": false,
+      "distribution_status": "NOT_APPLICABLE"
+    },
+    {
+      "name": "w",
+      "role": "parameter",
+      "quantity_type": "general",
+      "unit": {},
+      "domain": {
+        "type": "interval",
+        "lower": "0",
+        "upper": null,
+        "lower_closed": true,
+        "upper_closed": false
+      },
+      "stochastic": false,
+      "distribution_status": "NOT_APPLICABLE"
+    },
+    {
+      "name": "p",
+      "role": "control",
+      "quantity_type": "price",
+      "unit": {},
+      "domain": {
+        "type": "interval",
+        "lower": "0",
+        "upper": "100",
+        "lower_closed": true,
+        "upper_closed": false
+      },
+      "stochastic": false,
+      "distribution_status": "NOT_APPLICABLE"
+    },
+    {
+      "name": "e",
+      "role": "control",
+      "quantity_type": "effort",
+      "unit": {},
+      "domain": {
+        "type": "interval",
+        "lower": "0",
+        "upper": "100",
+        "lower_closed": true,
+        "upper_closed": false
+      },
+      "stochastic": false,
+      "distribution_status": "NOT_APPLICABLE"
+    }
+  ],
+  "players": [
+    {
+      "id": "retailer",
+      "objective": {
+        "op": "mul",
+        "args": [
+          {
+            "op": "sub",
+            "left": {
+              "op": "symbol",
+              "name": "p"
+            },
+            "right": {
+              "op": "symbol",
+              "name": "w"
+            }
+          },
+          {
+            "op": "add",
+            "args": [
+              {
+                "op": "sub",
+                "left": {
+                  "op": "symbol",
+                  "name": "A"
+                },
+                "right": {
+                  "op": "mul",
+                  "args": [
+                    {
+                      "op": "symbol",
+                      "name": "b"
+                    },
+                    {
+                      "op": "symbol",
+                      "name": "p"
+                    }
+                  ]
+                }
+              },
+              {
+                "op": "mul",
+                "args": [
+                  {
+                    "op": "symbol",
+                    "name": "gamma"
+                  },
+                  {
+                    "op": "symbol",
+                    "name": "e"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "influencer",
+      "objective": {
+        "op": "sub",
+        "left": {
+          "op": "mul",
+          "args": [
+            {
+              "op": "symbol",
+              "name": "a"
+            },
+            {
+              "op": "symbol",
+              "name": "p"
+            },
+            {
+              "op": "symbol",
+              "name": "e"
+            }
+          ]
+        },
+        "right": {
+          "op": "div",
+          "left": {
+            "op": "mul",
+            "args": [
+              {
+                "op": "symbol",
+                "name": "c"
+              },
+              {
+                "op": "pow",
+                "base": {
+                  "op": "symbol",
+                  "name": "e"
+                },
+                "exponent": 2
+              }
+            ]
+          },
+          "right": {
+            "op": "const",
+            "value": "2"
+          }
+        }
+      }
+    }
+  ],
+  "decisions": [
+    {
+      "id": "choose_price",
+      "player": "retailer",
+      "symbol": "p",
+      "stage": 1,
+      "information_set": "price_before_effort"
+    },
+    {
+      "id": "choose_effort",
+      "player": "influencer",
+      "symbol": "e",
+      "stage": 2,
+      "information_set": "effort_after_price"
+    }
+  ],
+  "information_sets": [
+    {
+      "id": "price_before_effort",
+      "player": "retailer",
+      "stage": 1,
+      "observes": []
+    },
+    {
+      "id": "effort_after_price",
+      "player": "influencer",
+      "stage": 2,
+      "observes": [
+        "price_revealed"
+      ]
+    }
+  ],
+  "signals": [
+    {
+      "id": "price_revealed",
+      "kind": "decision",
+      "decision_id": "choose_price",
+      "available_stage": 2
+    }
+  ],
+  "constraints": [
+    {
+      "id": "demand_nonnegative",
+      "lhs": {
+        "op": "sub",
+        "left": {
+          "op": "symbol",
+          "name": "A"
+        },
+        "right": {
+          "op": "mul",
+          "args": [
+            {
+              "op": "symbol",
+              "name": "b"
+            },
+            {
+              "op": "symbol",
+              "name": "p"
+            }
+          ]
+        }
+      },
+      "relation": "ge",
+      "rhs": {
+        "op": "const",
+        "value": "0"
+      }
+    },
+    {
+      "id": "price_above_wholesale",
+      "lhs": {
+        "op": "symbol",
+        "name": "p"
+      },
+      "relation": "ge",
+      "rhs": {
+        "op": "symbol",
+        "name": "w"
+      }
+    },
+    {
+      "id": "viable_market_parameters",
+      "lhs": {
+        "op": "symbol",
+        "name": "A"
+      },
+      "relation": "gt",
+      "rhs": {
+        "op": "mul",
+        "args": [
+          {
+            "op": "symbol",
+            "name": "b"
+          },
+          {
+            "op": "symbol",
+            "name": "w"
+          }
+        ]
+      }
+    }
+  ],
+  "source": {
+    "kind": "synthetic",
+    "note": "Constructed 2-stage feedback benchmark; not copied from a paper.",
+    "file_sha256": null,
+    "page": null
+  }
+}

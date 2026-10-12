@@ -1,0 +1,18 @@
+{
+  "payoffs": {
+    "retailer": "3",
+    "influencer": "-1"
+  },
+  "reservations": {
+    "retailer": "0",
+    "influencer": "0"
+  },
+  "decentralized": {
+    "price": "6"
+  },
+  "centralized": {
+    "price": "6"
+  },
+  "system_total": "2",
+  "centralized_total": "2"
+}

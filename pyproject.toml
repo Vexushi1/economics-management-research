@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "economics-management-research"
-version = "0.3.0"
+version = "0.4.0"
 description = "Offline-first research workflow contracts for economics and management"
 readme = "README.md"
 license = "MIT"
@@ -17,7 +17,7 @@ classifiers = [
 ]
 
 [project.optional-dependencies]
-math = ["sympy==1.14.0", "numpy==2.3.5"]
+math = ["sympy==1.14.0", "numpy==2.3.5", "scipy==1.17.0"]
 pdf = ["pypdf==6.20.0", "pdfplumber==0.11.10", "pdfminer.six==20260107"]
 dev = ["pytest==9.0.2", "ruff==0.13.2"]
 
