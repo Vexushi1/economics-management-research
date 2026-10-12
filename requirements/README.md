@@ -19,3 +19,15 @@ python -m pip install --no-deps --no-build-isolation -e .
 
 Versions and hashes restrict the selected distributions but do not replace
 package provenance, advisory monitoring, or a complete transitive-license audit.
+
+## Phase 2 PDF optional profile
+
+`requirements/pdf.in` records the three exact direct PDF package versions.
+The PDF dependency closure is recorded in the committed
+`ci-py312-linux.lock`, generated from `ci.in` and `pdf.in` on the
+Python 3.12 Ubuntu 24.04 runner. Final CI installs only the committed
+SHA-256-pinned artifacts without regenerating dependency versions.
+The PDF transitive closure includes Pillow, pypdfium2, charset-normalizer,
+cryptography and any of their dependencies. Builds target Ubuntu 24.04 x86_64
+and Python 3.12, not arbitrary OS/platform combinations.
+Use sandbox process limits for untrusted PDFs.
