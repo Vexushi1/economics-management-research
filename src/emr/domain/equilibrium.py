@@ -8,9 +8,9 @@ leader strategy range. No hard-coded economic symbols or functional forms.
 
 from __future__ import annotations
 
-from dataclasses import dataclass
 import re
-from typing import Mapping
+from collections.abc import Mapping
+from dataclasses import dataclass
 
 import sympy as sp
 
@@ -276,8 +276,8 @@ def backward_induction_two_stage(model: ValidatedGameSpec,
         return SequentialEquilibrium("UNRESOLVED", {}, None, None, None,
                                      ("ONLY_TWO_SINGLE_CONTROL_STAGES_SUPPORTED",))
     first, second = decisions
-    l, f = first["symbol"], second["symbol"]
-    leader, follower = compiled.symbol(l), compiled.symbol(f)
+    leader_name, f = first["symbol"], second["symbol"]
+    leader, follower = compiled.symbol(leader_name), compiled.symbol(f)
     bindings = _bind_parameters(compiled, parameters)
     f_objective = sp.cancel(compiled.objectives[second["player"]].subs(bindings))
     try:
@@ -293,8 +293,8 @@ def backward_induction_two_stage(model: ValidatedGameSpec,
         # The leader's full originally feasible range must admit the interior
         # response; restricting to a favorable subrange would be unsound.
         params = {k: str(v) for k, v in parameters.items()}
-        raw_interval = feasible_interval(compiled, l, params)
-        response_interval = feasible_interval(compiled, l, params, response=(f, reaction))
+        raw_interval = feasible_interval(compiled, leader_name, params)
+        response_interval = feasible_interval(compiled, leader_name, params, response=(f, reaction))
         if raw_interval != response_interval:
             raise OptimizationUnsupported("follower interior response not valid on whole leader domain")
         reduced = compiled.objectives[first["player"]].subs(
@@ -306,12 +306,12 @@ def backward_induction_two_stage(model: ValidatedGameSpec,
         l_star = leader_report.maximizers[0]
         f_star = sp.cancel(reaction.subs(leader, l_star))
         follower_report = best_response(compiled, second["player"], f,
-                                       parameters=parameters, fixed_controls={l: l_star})
+                                       parameters=parameters, fixed_controls={leader_name: l_star})
         if (follower_report.status != "GLOBAL_OPTIMUM_CHECKED" or
             follower_report.maximizers != (f_star,)):
             return SequentialEquilibrium("UNRESOLVED", {}, reaction, leader_report,
                                          follower_report, ("FOLLOWER_OPTIMALITY_NOT_CERTIFIED",))
-        return SequentialEquilibrium("EQUILIBRIUM_CHECKED", {l: l_star, f: f_star},
+        return SequentialEquilibrium("EQUILIBRIUM_CHECKED", {leader_name: l_star, f: f_star},
                                      reaction, leader_report, follower_report,
                                      ("TWO_STAGE_STRICT_CONCAVE_FOLLOWER_AND_QUADRATIC_LEADER",
                                       "FEASIBILITY_AND_KKT_CHECKED_ON_FULL_LEADER_INTERVAL"))

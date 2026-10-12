@@ -8,7 +8,7 @@ import sympy as sp
 
 from emr.adapters.symbolic_sympy import compile_game, differentiate, hessian, solve_foc
 from emr.domain.equilibrium import best_response
-from emr.domain.game import validate_game_spec
+from emr.domain.game import GameSpecValidationError, ValidatedGameSpec, validate_game_spec
 
 FILES = Path(__file__).resolve().parents[1] / "fixtures" / "stackelberg_linear"
 VALUES = {"A": "10", "a": "1", "b": "1", "c": "1", "gamma": "0.2", "w": "2"}
@@ -32,7 +32,6 @@ def test_analytic_foc_is_only_candidate_until_global_check():
 
 
 def test_phase3_data_always_revalidated_before_sympy_conversion():
-    from emr.domain.game import ValidatedGameSpec, GameSpecValidationError
     broken = load().data
     broken["players"][1]["objective"] = {"op": "call", "name": "__import__", "args": []}
     with pytest.raises(GameSpecValidationError):

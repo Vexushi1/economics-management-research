@@ -1,4 +1,4 @@
-name: Phase 4 Candidate CI (Phase 3 model contracts)
+name: Phase 4 Math CI (hash-locked) (Phase 3 model contracts)
 
 on:
   pull_request:
@@ -19,18 +19,9 @@ jobs:
         uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
         with:
           python-version: '3.12'
-      # Temporary PR bootstrap ONLY; remove before ready/merge.
-      - name: Generate audited candidate SciPy lock (temporary)
-        run: |
-          python -m pip install --disable-pip-version-check uv==0.10.0
-          uv pip compile requirements/ci.in requirements/pdf.in --python-version 3.12 --generate-hashes --output-file /tmp/emr-phase4.lock
-          echo 'PHASE4_LOCK_BEGIN'
-          base64 -w0 /tmp/emr-phase4.lock
-          echo
-          echo 'PHASE4_LOCK_END'
       - name: Install hash-locked Python dependencies
         run: |
-          python -m pip install --disable-pip-version-check --require-hashes --only-binary=:all: -r /tmp/emr-phase4.lock
+          python -m pip install --disable-pip-version-check --require-hashes --only-binary=:all: -r requirements/ci-py312-linux.lock
       - name: Install local project without dependency resolution
         run: python -m pip install --disable-pip-version-check --no-deps --no-build-isolation -e .
       - name: Dependency compatibility

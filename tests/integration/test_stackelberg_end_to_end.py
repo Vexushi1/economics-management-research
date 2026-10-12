@@ -3,12 +3,13 @@
 import json
 from pathlib import Path
 
+import pytest
 import sympy as sp
 from scipy.optimize import minimize_scalar
 
 from emr.adapters.symbolic_sympy import compile_game, simplify_identity
 from emr.domain.equilibrium import backward_induction_two_stage
-from emr.domain.game import validate_game_spec
+from emr.domain.game import GameSpecValidationError, validate_game_spec
 
 HERE = Path(__file__).resolve().parents[1] / "fixtures/stackelberg_linear"
 PARAMS = {"A": "10", "a": "1", "b": "1", "c": "1", "gamma": "0.2", "w": "2"}
@@ -72,8 +73,6 @@ def test_solver_refuses_unproven_more_than_two_stages():
     source_dict = source.data
     source_dict["time"]["stages"] = 3
     # Changes are rejected by Phase 3 schema before reaching the engine.
-    import pytest
-    from emr.domain.game import GameSpecValidationError
     with pytest.raises(GameSpecValidationError):
         validate_game_spec(source_dict)
 

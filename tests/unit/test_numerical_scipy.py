@@ -3,8 +3,13 @@
 import json
 from pathlib import Path
 
+import pytest
+
 from emr.adapters.numerical_scipy import (
-    evaluate_residuals, find_roots, optimize_constrained, parameter_grid,
+    evaluate_residuals,
+    find_roots,
+    optimize_constrained,
+    parameter_grid,
 )
 from emr.adapters.symbolic_sympy import compile_game
 from emr.domain.game import validate_game_spec
@@ -27,7 +32,6 @@ def test_multistart_numerical_returns_local_only_even_for_quadratic():
 def test_parameter_grid_is_bounded_and_deterministic():
     grid = parameter_grid({"a": 1}, {"gamma": (0.0, 0.2), "b": (1.0, 2.0)})
     assert len(grid) == 4 and grid[0] == {"a": 1, "gamma": 0.0, "b": 1.0}
-    import pytest
     with pytest.raises(ValueError):
         parameter_grid({}, {"x": tuple(range(21))})
 

@@ -6,10 +6,10 @@ paper-text interpretation. Checking IR/IC never implies game equilibrium.
 
 from __future__ import annotations
 
-from dataclasses import dataclass
 import re
+from collections.abc import Mapping
+from dataclasses import dataclass
 from fractions import Fraction
-from typing import Mapping
 
 
 @dataclass(frozen=True, slots=True)
