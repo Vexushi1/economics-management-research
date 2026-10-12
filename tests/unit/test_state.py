@@ -99,7 +99,7 @@ def test_oversize_rejected_without_disk_side_effect(tmp_path):
 
 def test_malicious_text_is_inert(tmp_path):
     sentinel = tmp_path / "pwned"
-    hostile = "__import__('pathlib').Path(%r).touch()" % str(sentinel)
+    hostile = f"__import__('pathlib').Path({str(sentinel)!r}).touch()"
     store = ResearchStateStore(tmp_path)
     store.save("safe.json", {**base_state(), "notes": [hostile]})
     assert not sentinel.exists()
