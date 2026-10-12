@@ -1,5 +1,7 @@
 # LICENSE_NOTICES.md — 第三方版权、许可与再发布限制审计
 
+> **状态更新（Phase 1）**：下文第 1—5 节保留 2026-10-12 Phase 0B 的历史审计快照。此后项目所有者已决定采用 MIT，根目录已有 `LICENSE`；`solving-model` 已确定独立净室重写，不直接复制源码。其余逐文件许可、传递依赖及 SBOM 未决事项仍保留。当前适用决策以本说明及文末 Phase 1 记录为准。
+
 > Phase 0B 文档审计 / 2026-10-12。关联：`SOURCES.md`、`docs/ENVIRONMENT_MATRIX.md`、`docs/DEPENDENCY_RISKS.md`、`MODIFICATION_PLAN.md`。  
 > **警告：本仓库目前未复制第三方 Skill 源码，也未决定本仓库自有代码的最终 LICENSE。** 以下仅为许可证证据和未来拟复用范围审查，不构成法律意见，也不应作为“所有模块已经获得再发布许可”的证明。
 
@@ -81,3 +83,12 @@
 - [ ] `[需要进一步确认]` 拟引入的外部 Python/CLI 库实际发行版本和许可证核实。
 
 **结论**：许可来源审查记录已落地；S01、S02 有 MIT 文本依据，S03 仍不能直接复制。**Phase 0B 完成不意味着这些阻断项自动解除，也不意味着 Phase 1 获得实施授权。**
+
+## Phase 1 dependency license record (2026-10-12)
+
+- The owner-selected license for this repository's new original code is **MIT**, see root `LICENSE`. This does not relicense third-party material.
+- GitHub Actions generated `requirements/ci-py312-linux.lock` for Ubuntu 24.04 x86_64 / Python 3.12. It contains exact direct and transitive versions and SHA-256 distribution hashes. CI uses `--require-hashes --only-binary`.
+- Direct dependencies: jsonschema 4.26.0 (MIT), SymPy 1.14.0 (BSD), NumPy 2.3.5 (BSD-style with bundled third-party notices); test tooling pytest 9.0.2 (MIT), Ruff 0.13.2 (MIT); build tooling setuptools 82.0.1 (MIT) and wheel 0.45.1 (MIT).
+- Resolved transitive dependencies: attrs, iniconfig, jsonschema-specifications, mpmath, packaging, pluggy, pygments, referencing, rpds-py, typing-extensions. **Full transitive license-text audit and SBOM remain [需要进一步确认]**, and no dependencies were copied into this repository.
+- Exact versions and distribution hashes mitigate drift and substitution; they do not eliminate compromised upstream releases, mutable infrastructure or runtime vulnerabilities.
+- `solving-model` remains **BLOCK_COPY**; only independent clean-room logic is allowed.
