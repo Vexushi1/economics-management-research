@@ -67,3 +67,35 @@ def test_invalid_anchor_sha_not_accepted(sample_pdf):
     record["proposition_candidates"][0]["anchor"]["file_sha256"] = "0" * 64
     with pytest.raises(ValueError, match="source anchor SHA"):
         validate_paper_record(record)
+
+
+def test_equation_candidates_preserve_block_geometry_and_unexecuted_quote(sample_pdf):
+    """Equation strings have source coordinates and never become math objects."""
+    doc = extract_pdf(sample_pdf)
+    record = paper_record(doc)
+    validate_paper_record(record)
+    assert record["equation_candidates"]
+    for item in record["equation_candidates"]:
+        assert item["status"] == "NOT_VERIFIED"
+        assert item["bbox_scope"] == "text_block"
+        bbox = item["bbox"]
+        assert len(bbox) == 4 and bbox[0] < bbox[2] and bbox[1] < bbox[3]
+        assert item["anchor"]["page"] >= 1
+        assert item["text"] == item["anchor"]["quote"].strip()
+        block = doc.pages[item["anchor"]["page"] - 1].blocks[item["anchor"]["block"]]
+        assert bbox == list(block.bbox)
+
+
+def test_equation_coordinates_are_required_and_checked(sample_pdf):
+    """A record cannot silently omit or invent nonphysical block geometry."""
+    record = paper_record(extract_pdf(sample_pdf))
+    item = record["equation_candidates"][0]
+    item.pop("bbox")
+    with pytest.raises(Exception):
+        validate_paper_record(record)
+
+    record = paper_record(extract_pdf(sample_pdf))
+    item = record["equation_candidates"][0]
+    item["bbox"] = [400.0, 20.0, 12.0, 45.0]
+    with pytest.raises(ValueError, match="coordinates are invalid"):
+        validate_paper_record(record)

@@ -6,6 +6,7 @@ real DOI registry entries, publication dates or causal/economic conclusions.
 
 from __future__ import annotations
 
+import math
 import re
 from collections.abc import Mapping
 from importlib.resources import files
@@ -34,18 +35,36 @@ def paper_record(document: PdfDocument) -> dict[str, object]:
                 doi = normalize_doi(match.group().rstrip(".,;:"))
                 if doi and doi not in doi_candidates:
                     doi_candidates.append(doi)
-            for line in block.text.splitlines():
+            # Work with original offsets: repeated lines must not point to their
+            # first occurrence in the same text block.
+            offset = 0
+            for raw_line in block.text.splitlines(keepends=True):
+                line = raw_line.rstrip("\r\n")
                 heading = line.strip()
                 if len(heading) < 150 and _HEADING.match(heading):
-                    pos = block.text.find(line)
-                    sections.append({"text": heading, "anchor": _anchor_dict(document, page.number, index, pos, pos + len(line)), "status": "NOT_VERIFIED"})
-            for match in _PROPOSITION.finditer(block.text):
-                propositions.append({"text": match.group(), "anchor": _anchor_dict(document, page.number, index, match.start(), match.end()), "status": "NOT_VERIFIED"})
-            # '=' also occurs in non-mathematical contexts; keep a bounded candidate only.
-            for line in block.text.splitlines():
+                    sections.append({
+                        "text": heading,
+                        "anchor": _anchor_dict(document, page.number, index, offset, offset + len(line)),
+                        "status": "NOT_VERIFIED",
+                    })
+                # '=' also occurs outside mathematics; never evaluate these strings.
                 if "=" in line and len(line) <= 280 and len(equations) < 300:
-                    start = block.text.find(line)
-                    equations.append({"text": line.strip(), "anchor": _anchor_dict(document, page.number, index, start, start + len(line)), "status": "NOT_VERIFIED"})
+                    equations.append({
+                        "text": line.strip(),
+                        "anchor": _anchor_dict(document, page.number, index, offset, offset + len(line)),
+                        "bbox": list(block.bbox),
+                        "bbox_scope": "text_block",
+                        "status": "NOT_VERIFIED",
+                    })
+                offset += len(raw_line)
+            for match in _PROPOSITION.finditer(block.text):
+                propositions.append({
+                    "text": match.group(),
+                    "anchor": _anchor_dict(
+                        document, page.number, index, match.start(), match.end()
+                    ),
+                    "status": "NOT_VERIFIED",
+                })
     if title is None and document.pages:
         for block in document.pages[0].blocks:
             candidate = block.text.splitlines()[0].strip()
@@ -110,6 +129,14 @@ def validate_paper_record(record: Mapping[str, object]) -> None:
                 raise ValueError("source anchor span or page is invalid")
             if anchor["quote"].strip() != item["text"].strip():
                 raise ValueError("candidate text differs from quoted evidence")
+            if field == "equation_candidates":
+                # These are *block* coordinates, not precise glyph bounds. They
+                # locate untrusted raw text without claiming formula recognition.
+                x0, top, x1, bottom = item["bbox"]
+                if not all(math.isfinite(x) for x in (x0, top, x1, bottom)):
+                    raise ValueError("candidate coordinates must be finite")
+                if not (x0 < x1 and top < bottom):
+                    raise ValueError("candidate text-block coordinates are invalid")
 
 
 def validate_literature_matrix(matrix: Mapping[str, object]) -> None:

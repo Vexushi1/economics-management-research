@@ -7,7 +7,7 @@ from jsonschema import Draft202012Validator
 
 from emr.adapters.pdf_extract import extract_pdf
 from emr.core.papers import literature_matrix, paper_record
-from emr.core.provenance import SourceAnchor, anchor_matches
+from emr.core.provenance import anchor_matches, SourceAnchor
 
 
 def test_pdf_to_grounded_matrix(sample_pdf):
@@ -17,6 +17,11 @@ def test_pdf_to_grounded_matrix(sample_pdf):
     assert record["file_sha256"] == matrix["rows"][0]["file_sha256"]
     for item in record["proposition_candidates"] + record["equation_candidates"]:
         assert anchor_matches(doc, SourceAnchor(**item["anchor"]))
+    for item in record["equation_candidates"]:
+        assert item["bbox_scope"] == "text_block"
+        assert item["bbox"] == list(
+            doc.pages[item["anchor"]["page"] - 1].blocks[item["anchor"]["block"]].bbox
+        )
     schema = json.loads(files("emr").joinpath("schemas/literature-matrix.schema.json").read_text())
     Draft202012Validator(schema).validate(matrix)
     assert matrix["rows"][0]["findings"] == []
