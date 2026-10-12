@@ -65,6 +65,11 @@ def test_enum_and_format_rejected():
         validate_research_state({**base_state(), "research_type": "bogus"})
     with pytest.raises(StateValidationError):
         validate_research_state({**base_state(), "updated_at": "tomorrow sometime"})
+    with pytest.raises(StateValidationError):
+        validate_research_state({**base_state(), "updated_at": "2026-02-30T12:00:00Z"})
+    assert validate_research_state({**base_state(), "updated_at": "2026-10-12T15:00:00Z"})[
+        "updated_at"
+    ] == "2026-10-12T15:00:00Z"
 
 
 def test_duplicate_json_keys_and_nan_rejected(tmp_path):

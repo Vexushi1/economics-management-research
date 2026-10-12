@@ -12,9 +12,11 @@ from __future__ import annotations
 import hashlib
 import json
 import os
+import re
 import tempfile
 from collections.abc import Mapping
 from dataclasses import dataclass
+from datetime import datetime
 from importlib.resources import files
 from pathlib import Path
 from typing import Any
@@ -22,6 +24,24 @@ from typing import Any
 from jsonschema import Draft202012Validator, FormatChecker
 
 MAX_STATE_BYTES = 1024 * 1024
+_RFC3339 = re.compile(
+    r"^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?(?:Z|[+-]\\d{2}:\\d{2})$"
+)
+
+
+def _is_rfc3339_datetime(value: object) -> bool:
+    """Strict timestamp check independent of optional format packages."""
+    if not isinstance(value, str) or _RFC3339.fullmatch(value) is None:
+        return False
+    try:
+        datetime.fromisoformat(value.replace("Z", "+00:00"))
+    except ValueError:
+        return False
+    return True
+
+
+_FORMAT_CHECKER = FormatChecker()
+_FORMAT_CHECKER.checks("date-time")(_is_rfc3339_datetime)
 
 
 class StateValidationError(ValueError):
@@ -59,7 +79,7 @@ def _validator() -> Draft202012Validator:
     if "$ref" in str(schema):
         raise StateValidationError("external or internal references are not supported")
     Draft202012Validator.check_schema(schema)
-    return Draft202012Validator(schema, format_checker=FormatChecker())
+    return Draft202012Validator(schema, format_checker=_FORMAT_CHECKER)
 
 
 def validate_research_state(state: Mapping[str, Any]) -> dict[str, Any]:
