@@ -44,3 +44,19 @@ def test_numeric_work_limits_reject_unbounded_batch_sizes():
                              ((0.0, 20.0),), starts=((4.0,),)*11)
     with pytest.raises(ValueError, match="output exceeds budget"):
         parameter_grid({}, {"a": tuple(range(20)), "b": tuple(range(20)), "c": tuple(range(20))})
+
+
+def test_untrusted_numeric_bindings_never_reach_sympy_parser(tmp_path):
+    compiled = compile_game(validate_game_spec(json.loads(FILE.read_text())))
+    sentinel = tmp_path / "not-created"
+    injected = f"__import__('pathlib').Path({str(sentinel)!r}).touch()"
+    with pytest.raises(ValueError, match="never expression text"):
+        evaluate_residuals(compiled, "influencer", "e", {**VALUES, "p": 6, "e": injected})
+    with pytest.raises(ValueError, match="never expression text"):
+        optimize_constrained(compiled, "influencer", ("e",), {**VALUES, "p": injected},
+                             ((0.0, 20.0),))
+    with pytest.raises(ValueError, match="never expression text"):
+        find_roots(compiled, "influencer", "e", {**VALUES, "p": injected}, ((0, 10),))
+    with pytest.raises(ValueError, match="never expression text"):
+        parameter_grid({}, {"alpha": (injected,)})
+    assert not sentinel.exists()
