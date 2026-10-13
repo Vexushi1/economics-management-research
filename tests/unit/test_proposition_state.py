@@ -126,9 +126,10 @@ def test_external_entry_mutation_cannot_forge_proved_or_erase_debt():
 
 
 def test_schema_blocks_forged_proved_report_with_unfinished_obligations():
-    from importlib.resources import files
-    from jsonschema import Draft202012Validator, ValidationError
     import json
+    from importlib.resources import files
+
+    from jsonschema import Draft202012Validator, ValidationError
 
     ledger = ProofLedger()
     ledger.register(sample_proposition())

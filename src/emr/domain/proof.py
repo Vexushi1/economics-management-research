@@ -21,8 +21,7 @@ import sympy as sp
 from jsonschema import Draft202012Validator
 
 from emr.adapters.symbolic_sympy import CompiledGame, compile_game
-from emr.domain.equilibrium import _number, best_response, feasible_interval
-from emr.domain.game import validate_game_spec
+from emr.domain.equilibrium import _number, best_response
 
 MAX_PROPOSITION_BYTES = 32_768
 _STEP_STATES = frozenset({"OK", "GAP", "ERROR", "UNCLEAR"})
