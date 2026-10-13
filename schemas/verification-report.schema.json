@@ -1,0 +1,257 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/emr/verification-report-v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "proposition_id",
+    "proof_version",
+    "scope",
+    "verdict",
+    "frozen",
+    "open_obligations",
+    "steps",
+    "counterexamples",
+    "evidence_refs",
+    "severity",
+    "reviewer",
+    "prior_report_id"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1"
+    },
+    "proposition_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 80
+    },
+    "proof_version": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "model_sha256",
+        "parameter_domains",
+        "quantifiers"
+      ],
+      "properties": {
+        "model_sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "parameter_domains": {
+          "type": "array"
+        },
+        "quantifiers": {
+          "type": "array"
+        }
+      }
+    },
+    "verdict": {
+      "enum": [
+        "OPEN",
+        "SKETCH_ACCEPTED",
+        "REVIEW_REQUIRED",
+        "PROVED",
+        "ERROR",
+        "REFUTED",
+        "UNCLEAR"
+      ]
+    },
+    "frozen": {
+      "type": "boolean"
+    },
+    "open_obligations": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "steps": {
+      "type": "array",
+      "maxItems": 500,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "obligation_id",
+          "status",
+          "evidence_refs"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "obligation_id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "status": {
+            "enum": [
+              "OK",
+              "GAP",
+              "ERROR",
+              "UNCLEAR"
+            ]
+          },
+          "evidence_refs": {
+            "type": "array",
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      }
+    },
+    "counterexamples": {
+      "type": "array",
+      "maxItems": 100,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "kind",
+          "witness",
+          "difference",
+          "precision",
+          "optimizer_status",
+          "model_sha256"
+        ],
+        "properties": {
+          "kind": {
+            "enum": [
+              "DERIVATIVE_IDENTITY",
+              "OPTIMALITY"
+            ]
+          },
+          "witness": {
+            "type": "object",
+            "minProperties": 1,
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "difference": {
+            "type": "string"
+          },
+          "precision": {
+            "const": "EXACT_RATIONAL"
+          },
+          "optimizer_status": {
+            "enum": [
+              "NOT_APPLICABLE",
+              "GLOBAL_OPTIMUM_CHECKED",
+              "MULTIPLE_MAXIMIZERS"
+            ]
+          },
+          "model_sha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          }
+        }
+      }
+    },
+    "evidence_refs": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "severity": {
+      "enum": [
+        "INFO",
+        "WARNING",
+        "ERROR",
+        "CRITICAL"
+      ]
+    },
+    "reviewer": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "prior_report_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "verdict": {
+            "const": "PROVED"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "open_obligations": {
+            "maxItems": 0
+          },
+          "reviewer": {
+            "type": "string",
+            "minLength": 1
+          },
+          "evidence_refs": {
+            "minItems": 1
+          },
+          "frozen": {
+            "const": false
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "verdict": {
+            "const": "REFUTED"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "frozen": {
+            "const": true
+          },
+          "counterexamples": {
+            "minItems": 1
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "frozen": {
+            "const": true
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "verdict": {
+            "const": "REFUTED"
+          }
+        }
+      }
+    }
+  ]
+}

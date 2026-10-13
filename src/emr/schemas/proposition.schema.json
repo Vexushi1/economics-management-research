@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/emr/proposition-v1",
+  "title": "Versioned mathematical proposition",
+  "type": "object", "additionalProperties": false,
+  "required": ["schema_version", "id", "statement", "author", "proof_version", "model_sha256", "quantifiers", "parameter_domains", "assumptions", "lemma_refs", "source_refs"],
+  "properties": {
+    "schema_version": {"const": "1"},
+    "id": {"type": "string", "pattern": "^[A-Za-z][A-Za-z0-9._-]{0,79}$"},
+    "statement": {"type": "string", "minLength": 1, "maxLength": 4096},
+    "author": {"type": "string", "minLength": 1, "maxLength": 128},
+    "proof_version": {"type": "integer", "minimum": 1, "maximum": 1000000},
+    "model_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "quantifiers": {"type": "array", "minItems": 1, "maxItems": 64, "items": {"type": "object", "additionalProperties": false, "required": ["kind", "symbol"], "properties": {"kind": {"enum": ["forall", "exists"]}, "symbol": {"type": "string", "pattern": "^[A-Za-z][A-Za-z0-9_]{0,63}$"}}}},
+    "parameter_domains": {"type": "array", "minItems": 1, "maxItems": 64, "items": {"$ref": "#/$defs/domain"}},
+    "assumptions": {"type": "array", "maxItems": 80, "items": {"type": "string", "maxLength": 1024}},
+    "lemma_refs": {"type": "array", "uniqueItems": true, "maxItems": 100, "items": {"type": "string", "maxLength": 128}},
+    "source_refs": {"type": "array", "uniqueItems": true, "minItems": 1, "maxItems": 100, "items": {"type": "string", "minLength": 1, "maxLength": 256}}
+  },
+  "$defs": {"domain": {"type": "object", "additionalProperties": false,
+    "required": ["symbol", "lower", "upper", "lower_closed", "upper_closed"],
+    "properties": {
+      "symbol": {"type": "string", "pattern": "^[A-Za-z][A-Za-z0-9_]{0,63}$"},
+      "lower": {"type": ["string", "null"], "pattern": "^-?[0-9]{1,12}(?:\\.[0-9]{1,8})?$"},
+      "upper": {"type": ["string", "null"], "pattern": "^-?[0-9]{1,12}(?:\\.[0-9]{1,8})?$"},
+      "lower_closed": {"type": "boolean"}, "upper_closed": {"type": "boolean"}
+    }
+  }}
+}
