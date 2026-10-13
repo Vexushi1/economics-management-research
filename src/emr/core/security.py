@@ -16,7 +16,7 @@ import json
 import re
 from collections.abc import Mapping
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from types import MappingProxyType
 from typing import Any
 
@@ -108,7 +108,7 @@ def _timestamp(value: Any) -> None:
         date = datetime.fromisoformat(value.replace("Z", "+00:00"))
     except ValueError as exc:
         raise SecurityBoundaryError("invalid approval timestamp") from exc
-    if date.tzinfo is None or date.utcoffset() != timezone.utc.utcoffset(date):
+    if date.tzinfo is None or date.utcoffset() != UTC.utcoffset(date):
         raise SecurityBoundaryError("approval must use UTC time")
 
 

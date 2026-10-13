@@ -7,8 +7,13 @@ from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
 
 from emr.core.security import (
-    SecurityBoundaryError, TrustPolicy, canonical_json, digest, parse_json_record,
-    verify_semantic_approval, verify_signed_ledger,
+    SecurityBoundaryError,
+    TrustPolicy,
+    canonical_json,
+    digest,
+    parse_json_record,
+    verify_semantic_approval,
+    verify_signed_ledger,
 )
 
 

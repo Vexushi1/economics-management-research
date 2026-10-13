@@ -13,7 +13,11 @@ from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
 
 from emr.core.evidence_chain import anchor_ref
 from emr.core.security import (
-    TrustPolicy, canonical_json, digest, parse_json_record, prepare_ledger_payload,
+    TrustPolicy,
+    canonical_json,
+    digest,
+    parse_json_record,
+    prepare_ledger_payload,
 )
 from emr.domain.citation_audit import CitationRecord
 from emr.domain.manuscript import assemble_manuscript
