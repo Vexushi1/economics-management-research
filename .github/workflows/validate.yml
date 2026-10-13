@@ -1,4 +1,4 @@
-name: Offline Research CI (Phase 3 model contracts)
+name: Phase 4 Math CI (hash-locked) (Phase 3 model contracts)
 
 on:
   pull_request:
@@ -36,6 +36,8 @@ jobs:
           PYCODE
       - name: Static analysis
         run: python -m ruff check src tests
+      - name: Verify Phase 4 SciPy version
+        run: python -c "from importlib.metadata import version; assert version('scipy') == '1.17.0'"
       - name: Unit and integration tests
         run: python -m pytest -q
       - name: CLI contract smoke
@@ -59,6 +61,8 @@ jobs:
                   "research-state.schema.json",
                   "paper-record.schema.json",
                   "literature-matrix.schema.json",
+                  "model-spec.schema.json",
+                  "equilibrium-result.schema.json",
                   "model-spec.schema.json",
               ):
                   assert f"emr/schemas/{name}" in names

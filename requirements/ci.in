@@ -8,3 +8,6 @@ sympy==1.14.0
 numpy==2.3.5
 pytest==9.0.2
 ruff==0.13.2
+
+# Phase 4 local numerical optimization (explicit math extra).
+scipy==1.17.0

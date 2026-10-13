@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Vexushi1/economics-management-research/schemas/equilibrium-result.schema.json",
+  "title": "Phase 4 candidate-vs-checked mathematical result",
+  "description": "Exact scope-limited certificates, never general theorem proof",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "model_id", "status", "model_sha256", "strategies", "evidence", "assumptions", "diagnostics"],
+  "properties": {
+    "schema_version": {"const": "1"},
+    "model_id": {"type": "string", "minLength": 1},
+    "model_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "status": {"enum": ["NOT_SOLVED", "CANDIDATE_STATIONARY_POINT", "KKT_CANDIDATE", "LOCAL_CANDIDATES_ONLY", "GLOBAL_OPTIMUM_CHECKED", "EQUILIBRIUM_CHECKED", "SET_VALUED_BEST_RESPONSE", "MULTIPLE_MAXIMIZERS", "MULTIPLE_EQUILIBRIA", "INFEASIBLE", "SUPREMUM_NOT_ATTAINED", "UNRESOLVED", "RESOURCE_LIMIT", "UNSUPPORTED"]},
+    "strategies": {"type": "object", "propertyNames": {"pattern": "^[A-Za-z][A-Za-z0-9_]{0,31}$"}, "additionalProperties": {"type": "string", "maxLength": 512}},
+    "evidence": {"type": "array", "maxItems": 80, "items": {"type": "string", "maxLength": 512}},
+    "assumptions": {"type": "array", "maxItems": 80, "items": {"type": "string", "maxLength": 512}},
+    "diagnostics": {"type": "array", "maxItems": 80, "items": {"type": "string", "maxLength": 512}},
+    "uniqueness_verified": {"type": "boolean"},
+    "feasibility_checked": {"type": "boolean"},
+    "global_optimality_checked": {"type": "boolean"},
+    "verification_scope": {"type": "string", "maxLength": 256},
+    "tolerance": {"type": ["number", "null"], "exclusiveMinimum": 0},
+    "starts": {"type": "array", "maxItems": 20, "items": {"type": "object"}}
+  },
+  "allOf": [
+    {"if": {"properties": {"status": {"const": "EQUILIBRIUM_CHECKED"}}}, "then": {"required": ["feasibility_checked", "global_optimality_checked", "verification_scope"], "properties": {"feasibility_checked": {"const": true}, "global_optimality_checked": {"const": true}}}}
+  ]
+}
