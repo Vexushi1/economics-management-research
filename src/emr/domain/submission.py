@@ -27,7 +27,12 @@ from emr.core.security import (
 from emr.domain.citation_audit import CitationAuditError, CitationRecord, validate_citations
 from emr.domain.game import ValidatedGameSpec
 from emr.domain.manuscript import DraftArtifact, ManuscriptError, assemble_manuscript, trusted_core
-from emr.domain.proof import ProofAuditError, ProofLedger, model_fingerprint, render_verification_report
+from emr.domain.proof import (
+    ProofAuditError,
+    ProofLedger,
+    model_fingerprint,
+    render_verification_report,
+)
 
 
 @dataclass(frozen=True, slots=True)
