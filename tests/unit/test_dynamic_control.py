@@ -69,3 +69,16 @@ def test_no_horizon_or_negative_horizon_rejected():
     model["horizon"]["end"] = "-2"
     with pytest.raises(DynamicInputError):
         validate_state_system(model)
+
+
+def test_fixed_terminal_target_is_preserved_in_necessary_conditions():
+    original = example()
+    original["terminal"] = {"type": "fixed", "value": "7.5"}
+    first = validate_state_system(original)
+    first_conditions = dict(build_optimal_control_tasks(first).conditions)
+    assert first.terminal_target == 15 / 2
+    assert first_conditions["terminal_state"] == "x(end) = 15/2; costate terminal free"
+    original["terminal"]["value"] = "8"
+    other_conditions = dict(build_optimal_control_tasks(validate_state_system(original)).conditions)
+    assert other_conditions["terminal_state"] == "x(end) = 8; costate terminal free"
+    assert other_conditions != first_conditions

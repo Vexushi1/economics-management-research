@@ -9,6 +9,7 @@ from __future__ import annotations
 import json
 from collections.abc import Mapping
 from fractions import Fraction
+from decimal import Decimal, localcontext
 from importlib.resources import files
 from typing import Any
 
@@ -50,6 +51,40 @@ def _report_check(data: dict[str, Any]) -> dict[str, Any]:
         raise ReplicationInputError("ready status without complete parameter provenance")
     if data["status"] != "UNREPRODUCIBLE_INPUT" and not data["formula_anchors"]:
         raise ReplicationInputError("missing original formula anchors")
+    # Derived comparison statuses are checked against the recorded exact values.
+    # A caller may supply a saved report, but cannot forge its arithmetic result.
+    tol_raw = data["comparison_tolerance"]
+    tol: Fraction | None = None
+    if tol_raw is not None:
+        try:
+            tol = _fraction(tol_raw)
+        except StochasticInputError as exc:
+            raise ReplicationInputError("invalid persisted comparison tolerance") from exc
+        if tol <= 0 or tol > Fraction(1, 10):
+            raise ReplicationInputError("comparison tolerance outside supported range")
+    if data["status"] == "READY_FOR_REPLICATION" and tol is not None:
+        raise ReplicationInputError("uncompared report cannot have a comparison tolerance")
+    if data["status"] in ("NUMERIC_COMPARISON_COMPLETE", "COMPARISON_MISMATCH"):
+        if any(target["status"] == "NOT_VERIFIED" for target in data["targets"]):
+            raise ReplicationInputError("completed comparison has unverified numerical targets")
+        if tol is None:
+            raise ReplicationInputError("completed comparison requires its exact tolerance")
+    for target in data["targets"]:
+        fields = ("published_value", "computed_value", "absolute_error")
+        if target["status"] == "NOT_VERIFIED":
+            if any(target[k] is not None for k in fields):
+                raise ReplicationInputError("unverified target cannot contain computed values")
+            continue
+        if tol is None or any(target[k] is None for k in fields):
+            raise ReplicationInputError("numerical status without complete computed evidence")
+        try:
+            published, computed, recorded_gap = (_fraction(target[k]) for k in fields)
+        except StochasticInputError as exc:
+            raise ReplicationInputError("invalid persisted numerical comparison") from exc
+        actual_gap = abs(published - computed)
+        expected_status = "NUMERIC_MATCH" if actual_gap <= tol else "NUMERIC_MISMATCH"
+        if recorded_gap != actual_gap or target["status"] != expected_status:
+            raise ReplicationInputError("forged or inconsistent numerical comparison")
     target_states = [target["status"] for target in data["targets"]]
     if data["status"] == "READY_FOR_REPLICATION" and any(
         value != "NOT_VERIFIED" for value in target_states
@@ -133,9 +168,20 @@ def build_replication_manifest(request: Mapping[str, Any]) -> dict[str, Any]:
               "status": "UNREPRODUCIBLE_INPUT" if missing else "READY_FOR_REPLICATION",
               "required_parameters": required, "missing_requirements": missing, "parameter_provenance": provenance,
               "formula_anchors": anchors if anchor_valid else [], "targets": out_targets,
+              "comparison_tolerance": None,
               "diagnostics": ["NO_UNVERIFIED_PARAMETERS_GUESSED"] if missing else
                              ["METADATA_COMPLETE_NOT_YET_REPRODUCED"]}
     return _report_check(report)
+
+
+def _exact_decimal(value: Fraction) -> str:
+    """Canonical terminating decimal for arithmetic derived from decimal inputs."""
+    with localcontext() as context:
+        context.prec = 60
+        result = format(Decimal(value.numerator) / Decimal(value.denominator), "f")
+    if Fraction(result) != value:
+        raise ReplicationInputError("comparison result cannot be stored as a finite decimal")
+    return result
 
 
 def compare_results(manifest: Mapping[str, Any], published: Mapping[str, Any],
@@ -159,6 +205,7 @@ def compare_results(manifest: Mapping[str, Any], published: Mapping[str, Any],
         raise ReplicationInputError("invalid absolute comparison tolerance") from exc
     if tol <= 0 or tol > Fraction(1, 10):
         raise ReplicationInputError("tolerance must be positive and small")
+    report["comparison_tolerance"] = _exact_decimal(tol)
     ids = {item["id"] for item in report["targets"]}
     if set(published) - ids or set(computed) - ids:
         raise ReplicationInputError("unexpected target result")
@@ -174,8 +221,8 @@ def compare_results(manifest: Mapping[str, Any], published: Mapping[str, Any],
             missing.append(f"NUMERIC_TARGET:{name}")
             continue
         difference = abs(source - value)
-        item.update(published_value=str(source), computed_value=str(value),
-                    absolute_error=str(difference),
+        item.update(published_value=_exact_decimal(source), computed_value=_exact_decimal(value),
+                    absolute_error=_exact_decimal(difference),
                     status="NUMERIC_MATCH" if difference <= tol else "NUMERIC_MISMATCH")
     if missing:
         report["missing_requirements"] = missing

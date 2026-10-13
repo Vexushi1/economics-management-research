@@ -113,3 +113,29 @@ def test_comparison_result_cannot_be_reused_as_an_approved_new_manifest():
     compared = compare_results(ready, {"table2": "1"}, {"table2": "1"})
     with pytest.raises(ReplicationInputError, match="uncompared ready manifest"):
         compare_results(compared, {"table2": "1"}, {"table2": "2"})
+
+
+def test_forged_numeric_status_or_difference_is_rejected():
+    ready = build_replication_manifest(manifest_request())
+    genuine = compare_results(ready, {"table2": "5"}, {"table2": "4"}, tolerance="0.000001")
+    assert genuine["status"] == "COMPARISON_MISMATCH"
+    for field, replacement in (("status", "NUMERIC_MATCH"), ("absolute_error", "0"),
+                               ("published_value", "4")):
+        forged = deepcopy(genuine)
+        forged["targets"][0][field] = replacement
+        if field == "status":
+            forged["status"] = "NUMERIC_COMPARISON_COMPLETE"
+        with pytest.raises(ReplicationInputError, match="forged or inconsistent"):
+            classify_discrepancy(forged)
+    forged = deepcopy(genuine)
+    forged["comparison_tolerance"] = None
+    with pytest.raises(ReplicationInputError, match="requires its exact tolerance"):
+        classify_discrepancy(forged)
+
+
+def test_valid_saved_numeric_report_revalidates_exact_arithmetic():
+    ready = build_replication_manifest(manifest_request())
+    actual = compare_results(ready, {"table2": "5"}, {"table2": "5.0000002"},
+                             tolerance="0.000001")
+    assert actual["status"] == "NUMERIC_COMPARISON_COMPLETE"
+    assert classify_discrepancy(actual) == "WITHIN_ABSOLUTE_TOLERANCE"

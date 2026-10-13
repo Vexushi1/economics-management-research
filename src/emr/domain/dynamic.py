@@ -39,6 +39,7 @@ class LinearStateSystem:
     reward: tuple[Fraction, Fraction, Fraction, Fraction, Fraction, Fraction]
     terminal_type: Literal["free", "fixed"]
     terminal_reward: tuple[Fraction, Fraction] | None
+    terminal_target: Fraction | None
     control_bounds: tuple[Fraction, Fraction]
 
 
@@ -105,14 +106,15 @@ def validate_state_system(raw: Mapping[str, Any]) -> LinearStateSystem | Dynamic
         if terminal_type == "fixed":
             if set(terminal) != {"type", "value"}:
                 raise DynamicInputError("fixed terminal state requires target")
-            _fraction(terminal["value"])
+            terminal_target = _fraction(terminal["value"])
             terminal_reward = None
         else:
             if set(terminal) != {"type", "terminal_reward"} or not isinstance(terminal["terminal_reward"], dict):
                 raise DynamicInputError("free endpoint requires terminal reward coefficients")
+            terminal_target = None
             terminal_reward = _required_numbers(terminal["terminal_reward"], ("linear", "quadratic"))
         return LinearStateSystem((t0, t1), x0, drift, reward, terminal_type, terminal_reward,
-                                 (lo, hi))
+                                 terminal_target, (lo, hi))
     except (StochasticInputError, TypeError, KeyError) as exc:
         raise DynamicInputError("invalid or missing linear control input") from exc
 
@@ -157,7 +159,10 @@ def build_optimal_control_tasks(model: LinearStateSystem | DynamicAssessment) ->
         )
         conditions.append(("terminal_costate", str(phi_prime)))
     else:
-        conditions.append(("terminal_state", "FIXED_TARGET; costate terminal free"))
+        if model.terminal_target is None:
+            return DynamicAssessment("INCOMPLETE_INPUT", "linear_control", diagnostics=("MISSING_TERMINAL_TARGET",))
+        target = sp.Rational(model.terminal_target.numerator, model.terminal_target.denominator)
+        conditions.append(("terminal_state", f"x(end) = {target}; costate terminal free"))
     conditions.append(("control_optimality", "BOX_MAXIMUM_CONDITION_REQUIRED"))
     return DynamicAssessment("NECESSARY_CONDITIONS_ONLY", "linear_control",
                              tuple(conditions), preflight.diagnostics + ("NOT_SOLVED",))
