@@ -1,4 +1,4 @@
-name: Phase 8 Manuscript G6 Audit CI (hash-locked)
+name: Phase 9 Semantic Security CI (hash-locked)
 
 on:
   pull_request:
@@ -34,6 +34,8 @@ jobs:
           assert version("pdfplumber") == "0.11.10"
           assert version("pdfminer.six") == "20260107"
           PYCODE
+      - name: Verify reviewed Ed25519 backend pin
+        run: python -c "from importlib.metadata import version; assert version('cryptography') == '50.0.2'"
       - name: Static analysis
         run: python -m ruff check src tests
       - name: Verify Phase 4 SciPy version
