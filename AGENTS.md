@@ -19,3 +19,9 @@
 - Do not exchange `max E[payoff]` and `E[max payoff]`; require explicit decision/revelation timing. Missing joint distributions, integrability proofs, original parameters and source formulas must remain missing, not synthesized.
 - Linear PMP outputs are **necessary-condition tasks**, not solved state trajectories, HJB results, optimal controls or transversality proofs.
 - If any original reference coefficient or target is absent, emit `UNREPRODUCIBLE_INPUT` and stop downstream comparisons. Never backfill with benchmark values.
+
+## Phase 7 integrity
+
+- Re-audit model, parameters and proof status against exact PDF source anchors and ModelSpec fingerprints; changed upstream facts return `STALE`.
+- A source text anchor is not evidence that an economic formula has been faithfully interpreted. Keep `NOT_VERIFIED` independent of checked model-conditional optima.
+- Empirical causality is never inferred from correlation, prediction scores or merely listing DID/IV/panel identifying assumptions. No estimator or online data transfer is enabled by default.

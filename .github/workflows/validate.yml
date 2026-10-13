@@ -1,4 +1,4 @@
-name: Phase 6 Stochastic Dynamic Replication CI (hash-locked)
+name: Phase 7 Evidence Chain + Empirical CI (hash-locked)
 
 on:
   pull_request:

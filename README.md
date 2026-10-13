@@ -128,3 +128,7 @@ Three **offline**, opt-in modules extend the Phase 5 proof-audit baseline:
 - `emr.domain.replication`: source-backed parameter completeness check and conservative numeric comparisons. Unknown required coefficients, published target data or original formula anchors result in `UNREPRODUCIBLE_INPUT`, never guessed defaults. Numerical agreement is not independent proof.
 
 Example synthetic fixtures reside in `tests/fixtures/stochastic_supply/`, `tests/fixtures/differential_state/` and `examples/paper-replication/`. No private paper PDFs have been added to the repository. See the corresponding Skill files for limits. Future high-risk PDF processing still requires an OS-level resource sandbox.
+
+## Phase 7 optional empirical guards
+
+The new `emr.domain.econometrics` validates estimands, DID/IV/panel assumptions and data structure without estimating coefficients or claiming identification. Even complete assumptions remain `ASSUMPTIONS_DOCUMENTED_NOT_VERIFIED`. Phase 1-6 provenance can be re-audited using `emr.core.evidence_chain`; a change in model/parameters/proof report returns `STALE`. Precise PDF anchors do not by themselves verify the mathematical interpretation of source text.
