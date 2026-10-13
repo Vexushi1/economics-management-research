@@ -8,8 +8,8 @@ from __future__ import annotations
 
 import json
 from collections.abc import Mapping
-from fractions import Fraction
 from decimal import Decimal, localcontext
+from fractions import Fraction
 from importlib.resources import files
 from typing import Any
 
