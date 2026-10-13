@@ -7,7 +7,6 @@ The G6 process receives public keys only and never a KMS signing token.
 from __future__ import annotations
 
 import base64
-import json
 import re
 import ssl
 from collections.abc import Callable

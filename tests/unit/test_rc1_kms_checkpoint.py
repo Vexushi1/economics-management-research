@@ -52,7 +52,8 @@ def checkpoint():
 
 def test_signed_policy_over_untrusted_transport():
     root, env = checkpoint()
-    transport = lambda request, **kwargs: Response(json.dumps(env).encode())
+    def transport(request, **kwargs):
+        return Response(json.dumps(env).encode())
     client = ProtectedCheckpointClient("https://trust.example.org/v1/trust-policy", pub(root),
                                        8, transport=transport)
     policy = client.fetch()
