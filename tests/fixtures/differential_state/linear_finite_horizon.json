@@ -1,0 +1,8 @@
+{
+  "kind":"deterministic_linear_scalar_control",
+  "horizon":{"start":"0","end":"5"}, "initial_state":"2",
+  "drift":{"a":"-0.1","b":"2","c":"1"},
+  "running_reward":{"q_xx":"-0.5","q_x":"1","q_uu":"-1","q_u":"2","q_xu":"0","constant":"0"},
+  "terminal":{"type":"free","terminal_reward":{"linear":"3","quadratic":"0"}},
+  "control_bounds":{"lower":"0","upper":"4"}
+}

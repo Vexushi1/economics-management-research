@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "economics-management-research"
-version = "0.5.0"
+version = "0.6.0"
 description = "Offline-first research workflow contracts for economics and management"
 readme = "README.md"
 license = "MIT"

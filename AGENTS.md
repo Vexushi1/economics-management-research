@@ -12,3 +12,10 @@
 
 - Main project code is MIT licensed; preserve `third_party/` notices for any future external code.
 - Research states use immutable, Schema-validated JSON snapshots; source PDFs remain untrusted data.
+
+## Phase 6 research-integrity rules
+
+- A finite stochastic optimization result is global **only over the supplied finite action set**. Never promote that to a continuous-state, game-theoretic or analytical global result.
+- Do not exchange `max E[payoff]` and `E[max payoff]`; require explicit decision/revelation timing. Missing joint distributions, integrability proofs, original parameters and source formulas must remain missing, not synthesized.
+- Linear PMP outputs are **necessary-condition tasks**, not solved state trajectories, HJB results, optimal controls or transversality proofs.
+- If any original reference coefficient or target is absent, emit `UNREPRODUCIBLE_INPUT` and stop downstream comparisons. Never backfill with benchmark values.

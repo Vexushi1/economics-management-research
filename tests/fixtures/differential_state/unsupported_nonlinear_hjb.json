@@ -1,0 +1,1 @@
+{"kind":"stochastic_hjb_game", "drift":{"op":"exp","args":[{"op":"pow","base":"state","exponent":999999}]},"noise":"Wiener process", "agents":1000}

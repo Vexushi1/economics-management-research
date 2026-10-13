@@ -1,4 +1,4 @@
-name: Phase 4 Math CI (hash-locked) (Phase 3 model contracts)
+name: Phase 6 Stochastic Dynamic Replication CI (hash-locked)
 
 on:
   pull_request:
@@ -38,6 +38,8 @@ jobs:
         run: python -m ruff check src tests
       - name: Verify Phase 4 SciPy version
         run: python -c "from importlib.metadata import version; assert version('scipy') == '1.17.0'"
+      - name: Validate Phase 6 pinned schema mirror
+        run: python -c "from pathlib import Path; assert Path('schemas/replication-report.schema.json').read_bytes() == Path('src/emr/schemas/replication-report.schema.json').read_bytes()"
       - name: Unit and integration tests
         run: python -m pytest -q
       - name: CLI contract smoke
@@ -65,7 +67,7 @@ jobs:
                   "equilibrium-result.schema.json",
                   "proposition.schema.json",
                   "verification-report.schema.json",
-                  "model-spec.schema.json",
+                  "replication-report.schema.json",
               ):
                   assert f"emr/schemas/{name}" in names
           PYCODE

@@ -1,0 +1,6 @@
+{
+  "distribution_type":"finite_joint",
+  "scenarios":[{"id":"s1","probability":"0.2"},{"id":"s2","probability":"0.3"},{"id":"s3","probability":"0.5"}],
+  "actions":["a","b"], "payoffs":[["5","9"],["4","2"],["8","1"]],
+  "truncation_event":["s1","s2"],"decision_timing":"after_observation"
+}
