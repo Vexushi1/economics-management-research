@@ -147,8 +147,10 @@ def compare_results(manifest: Mapping[str, Any], published: Mapping[str, Any],
     """
     report = _copy(manifest)
     _report_check(report)
+    if report["status"] == "UNREPRODUCIBLE_INPUT":
+        return report  # missing input is a terminal safety gate, not a default value.
     if report["status"] != "READY_FOR_REPLICATION":
-        return {**report, "status": "UNREPRODUCIBLE_INPUT"}
+        raise ReplicationInputError("only an uncompared ready manifest may be compared")
     if not isinstance(published, Mapping) or not isinstance(computed, Mapping):
         raise ReplicationInputError("numerical data sources must be explicit mappings")
     try:

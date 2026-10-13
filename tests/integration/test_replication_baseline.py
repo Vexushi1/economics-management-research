@@ -106,3 +106,10 @@ def test_forged_completed_report_with_unchecked_targets_is_rejected():
     forged["status"] = "NUMERIC_COMPARISON_COMPLETE"
     with pytest.raises(ReplicationInputError, match="unverified numerical"):
         classify_discrepancy(forged)
+
+
+def test_comparison_result_cannot_be_reused_as_an_approved_new_manifest():
+    ready = build_replication_manifest(manifest_request())
+    compared = compare_results(ready, {"table2": "1"}, {"table2": "1"})
+    with pytest.raises(ReplicationInputError, match="uncompared ready manifest"):
+        compare_results(compared, {"table2": "1"}, {"table2": "2"})

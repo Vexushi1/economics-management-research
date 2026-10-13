@@ -4,7 +4,11 @@ from random import Random
 
 import pytest
 
-from emr.domain.stochastic import StochasticInputError, check_distribution_support, expected_objective
+from emr.domain.stochastic import (
+    StochasticInputError,
+    check_distribution_support,
+    expected_objective,
+)
 
 
 def test_many_unrelated_game_tables_respect_information_value():
