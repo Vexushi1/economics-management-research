@@ -136,7 +136,7 @@ def test_external_checkpoint_issuer_signs_versioned_policy_and_verifies():
 
     class IssuerOutsideG6:
         def sign(self, msg):
-            assert msg.startswith(b"EMR:CHECKPOINT:V1\\0")
+            assert msg.startswith(b"EMR:CHECKPOINT:V1" + bytes([0]))
             return root.sign(msg)
 
     issued = sign_checkpoint_policy(IssuerOutsideG6(), envelope["policy"])
