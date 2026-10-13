@@ -20,8 +20,18 @@
 - Linear PMP outputs are **necessary-condition tasks**, not solved state trajectories, HJB results, optimal controls or transversality proofs.
 - If any original reference coefficient or target is absent, emit `UNREPRODUCIBLE_INPUT` and stop downstream comparisons. Never backfill with benchmark values.
 
-## Phase 7 integrity
 
-- Re-audit model, parameters and proof status against exact PDF source anchors and ModelSpec fingerprints; changed upstream facts return `STALE`.
-- A source text anchor is not evidence that an economic formula has been faithfully interpreted. Keep `NOT_VERIFIED` independent of checked model-conditional optima.
-- Empirical causality is never inferred from correlation, prediction scores or merely listing DID/IV/panel identifying assumptions. No estimator or online data transfer is enabled by default.
+## Phase 7 evidence-integrity and empirical preflight
+
+- For paper-source models, validate the PDF anchor, model SHA, exact parameter bindings, solver result and proof report together. Any upstream change returns `STALE`; never reuse a prior `PROVED`/`EQUILIBRIUM_CHECKED` without recalculation.
+- Provenance location does not demonstrate mathematical/semantic fidelity to a source text. Preserve `NOT_VERIFIED` separately from model-conditional checked equilibria.
+- Empirical data and estimator are optional. DID/IV/panel assumptions must be declared with evidence links, but declarations alone never authorize a causal effect claim.
+- Predictive performance and descriptive correlation cannot be promoted to causal inference. The Phase 7 empirical adapter performs no estimations or external data access.
+
+
+## Phase 8 — restricted writing and G6 release integrity
+
+- Never pass a proof ledger, validated game payload, full macro TeX or solver output to an untrusted LLM for rewriting. Only three bounded plain-text prose slots are permitted; escaped at injection.
+- Always regenerate mathematical macro bytes and compare the *whole submitted manuscript* with independent source, model, parameter and proof ledger inputs; a draft's self-supplied SHA does not prove integrity.
+- A claim support verdict and a DOI identity are distinct. `CLAIM_UNSUPPORTED`, missing/retracted/unknown citation evidence, unproved proposition, changed upstream fingerprint and unverified source-to-model interpretation block G6.
+- Journal rules are not fixed truths: obtain current official instructions before real submission. G6 v1 is offline fail-closed and deliberately cannot authenticate source-semantic human approval.

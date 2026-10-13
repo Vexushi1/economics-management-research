@@ -129,6 +129,47 @@ Three **offline**, opt-in modules extend the Phase 5 proof-audit baseline:
 
 Example synthetic fixtures reside in `tests/fixtures/stochastic_supply/`, `tests/fixtures/differential_state/` and `examples/paper-replication/`. No private paper PDFs have been added to the repository. See the corresponding Skill files for limits. Future high-risk PDF processing still requires an OS-level resource sandbox.
 
-## Phase 7 optional empirical guards
+## Phase 7 (opt-in, empirical identification preflight)
 
-The new `emr.domain.econometrics` validates estimands, DID/IV/panel assumptions and data structure without estimating coefficients or claiming identification. Even complete assumptions remain `ASSUMPTIONS_DOCUMENTED_NOT_VERIFIED`. Phase 1-6 provenance can be re-audited using `emr.core.evidence_chain`; a change in model/parameters/proof report returns `STALE`. Precise PDF anchors do not by themselves verify the mathematical interpretation of source text.
+`emr.domain.econometrics` is not an econometric estimator. It checks a bounded
+JSON empirical-design contract and preserves missing assumptions as critical
+warnings. DID/IV/panel method selection and declared assumptions never authorize
+a causal claim. `collect_estimand()` returns `DEFINED_NOT_ESTIMATED`. The optional
+module has no runtime dependency on data packages and leaves the theoretical
+research workflow unchanged. The end-to-end provenance crucible in
+`tests/integration/test_end_to_end_evidence_chain.py` rechecks source/model /
+solver/proof bindings and marks any changed model, parameter or proof source as
+`STALE`; a faithful semantic interpretation of source text still requires review.
+
+
+## Phase 8 — read-only math macros and G6 manuscript audit (offline)
+
+The manuscript assembler in `emr.domain.manuscript` accepts **only** three
+plain-text writing slots: Introduction, Literature Review, Conclusion. It
+escapes TeX control sequences and replaces only declared `[CITE:claim_id]`
+markers with controlled `\cite{key}` commands. Core checked conditional
+results, exact source anchors, model/parameter fingerprints and Phase 5 proof
+markers are emitted from trusted computational inputs into a delimited LaTeX
+macro block. No LLM gets permission to edit Model Setup, formulas, theorems,
+proofs or results.
+
+`emr.domain.submission.audit_submission` (G6) replays the independent Phase 7
+evidence seal, reassembles the manuscript from independently passed inputs,
+checks exact canonical output bytes and the macro block digest, verifies proof
+state and separately audits citation metadata/retraction/claim support. A real
+DOI **does not** demonstrate that its source supports an economic assertion.
+`CLAIM_UNSUPPORTED` blocks submission. G6 returns a detailed structured audit
+log (`render_g6_report`; bundled `g6-audit` JSON Schema).
+
+**This initial offline G6 intentionally cannot declare a paper with an
+unreviewed PDF-to-ModelSpec semantic bridge submission-ready.** The Phase 7
+seal always preserves `NOT_VERIFIED` for that bridge: G6 emits
+`SEMANTIC_BRIDGE_NOT_VERIFIED`. Completing a source-interpretation audit,
+authenticating reviewer identities, confirming actual DOI registries, current
+journal policies, retract status and claim semantics require independently
+trusted review infrastructure. Source/hash integrity is not proof of academic
+truth. Macro immutability is enforced *within this compiler and G6 replay*, not
+cryptographically by LaTeX itself or against a privileged process mutating all
+trusted inputs. The TeX compile smoke test SKIPs explicitly if TeX is missing.
+
+No private PDF or unsupported citations are published with the repository.
