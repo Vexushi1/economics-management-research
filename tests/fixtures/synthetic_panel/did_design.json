@@ -1,0 +1,44 @@
+{
+  "design_version": "1",
+  "study_id": "synthetic_did",
+  "method": "did",
+  "intent": "causal",
+  "data_structure": "panel",
+  "outcome": "sales",
+  "treatment": "streaming",
+  "target_population": "Synthetic merchants observed over two periods",
+  "estimand": "ATT",
+  "assumptions": [
+    {
+      "name": "parallel_trends",
+      "status": "ASSERTED_NOT_VERIFIED",
+      "evidence_refs": [
+        "synthetic:design"
+      ]
+    },
+    {
+      "name": "no_anticipation",
+      "status": "ASSERTED_NOT_VERIFIED",
+      "evidence_refs": [
+        "synthetic:design"
+      ]
+    },
+    {
+      "name": "no_spillovers",
+      "status": "ASSERTED_NOT_VERIFIED",
+      "evidence_refs": [
+        "synthetic:design"
+      ]
+    },
+    {
+      "name": "common_support",
+      "status": "ASSERTED_NOT_VERIFIED",
+      "evidence_refs": [
+        "synthetic:design"
+      ]
+    }
+  ],
+  "source_refs": [
+    "synthetic:design"
+  ]
+}
