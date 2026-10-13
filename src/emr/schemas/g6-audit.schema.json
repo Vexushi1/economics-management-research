@@ -59,7 +59,8 @@
           "severity": {
             "enum": [
               "BLOCKER",
-              "WARNING"
+              "WARNING",
+              "CRITICAL"
             ]
           },
           "message": {

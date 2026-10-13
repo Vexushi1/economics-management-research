@@ -13,7 +13,13 @@ from dataclasses import asdict, dataclass
 from typing import Literal
 
 from emr.adapters.pdf_extract import PdfDocument
-from emr.core.evidence_chain import audit_evidence_seal
+from emr.core.evidence_chain import anchor_ref, audit_evidence_seal
+from emr.core.security import (
+    SecurityBoundaryError, TrustPolicy, digest, prepare_ledger_payload,
+    verify_semantic_approval, verify_signed_ledger,
+)
+from emr.adapters.symbolic_sympy import compile_game
+from emr.domain.proof import model_fingerprint
 from emr.core.provenance import SourceAnchor
 from emr.domain.citation_audit import CitationAuditError, CitationRecord, validate_citations
 from emr.domain.game import ValidatedGameSpec
@@ -24,7 +30,7 @@ from emr.domain.proof import ProofAuditError, ProofLedger, render_verification_r
 @dataclass(frozen=True, slots=True)
 class GateFinding:
     code: str
-    severity: Literal["BLOCKER", "WARNING"]
+    severity: Literal["BLOCKER", "WARNING", "CRITICAL"]
     message: str
     expected_digest: str | None = None
     observed_digest: str | None = None
@@ -77,7 +83,10 @@ def check_claim_evidence(citations: tuple[CitationRecord, ...],
 def audit_submission(draft: DraftArtifact, *, final_tex: str, document: PdfDocument,
                      anchor: SourceAnchor, model: ValidatedGameSpec,
                      parameters: Mapping[str, object], ledger: ProofLedger,
-                     prose: Mapping[str, str], citations: tuple[CitationRecord, ...]) -> G6Report:
+                     prose: Mapping[str, str], citations: tuple[CitationRecord, ...],
+                     semantic_approval: Mapping[str, object] | None = None,
+                     signed_ledger: Mapping[str, object] | None = None,
+                     trust: TrustPolicy | None = None) -> G6Report:
     """Fail closed with *multi-cause* audit log, not premature short circuit.
 
     Phase 7 provenance facts are recalculated from independent references;
@@ -115,9 +124,22 @@ def audit_submission(draft: DraftArtifact, *, final_tex: str, document: PdfDocum
         upstream = "CURRENT"
     if draft.evidence_seal.source_status != "NOT_VERIFIED" or draft.evidence_seal.semantic_bridge_status != "NOT_VERIFIED":
         fail("EVIDENCE_STATUS_FORGED", "source/semantic bridge status is not the established contract")
-    # There is no authenticated Phase 8 semantic bridge reviewer yet. Do not
-    # pretend a PDF locator demonstrates source meaning or claim support.
-    fail("SEMANTIC_BRIDGE_NOT_VERIFIED", "paper-to-model interpretation needs independent source review")
+    # Human approval is separately signed and scoped to this exact paper/model.
+    if semantic_approval is None:
+        fail("SEMANTIC_BRIDGE_NOT_VERIFIED",
+             "human paper-to-model approval with detached signature required")
+    elif trust is None:
+        fail("TRUST_ANCHOR_MISSING", "reviewer public keys must come from a protected source")
+    else:
+        try:
+            verified_model_sha = model_fingerprint(compile_game(model))
+            verify_semantic_approval(semantic_approval, trust,
+                                     pdf_sha256=document.sha256,
+                                     source_anchor=anchor_ref(anchor),
+                                     model_sha256=verified_model_sha)
+        except (SecurityBoundaryError, ValueError, TypeError, KeyError) as exc:
+            fail("SEMANTIC_APPROVAL_INVALID",
+                 f"independent reviewer signature/scope invalid: {type(exc).__name__}: {exc}")
 
     try:
         report = render_verification_report(ledger, draft.proposition_id, draft.proof_version)
@@ -129,6 +151,7 @@ def audit_submission(draft: DraftArtifact, *, final_tex: str, document: PdfDocum
 
     # Independent regeneration catches a forged draft+hash pair, and untrusted
     # math snippets inserted outside the delimited core (not only macros).
+    expected = None
     try:
         expected = assemble_manuscript(document, anchor, model, parameters, ledger,
                                        draft.proposition_id, draft.proof_version,
@@ -145,6 +168,33 @@ def audit_submission(draft: DraftArtifact, *, final_tex: str, document: PdfDocum
     except (ManuscriptError, ValueError, KeyError, TypeError) as exc:
         fail("CANONICAL_REBUILD_FAILED", f"independent assembly failed: {type(exc).__name__}")
         used_claims = draft.used_claims
+
+    # A local self-hash is NOT an authoritative checkpoint. Verify detached
+    # signing keys and freshness against out-of-band trusted policy.
+    if trust is None:
+        if not any(item.code == "TRUST_ANCHOR_MISSING" for item in issues):
+            fail("TRUST_ANCHOR_MISSING",
+                 "protected ledger public key and external checkpoint required")
+    if signed_ledger is None:
+        fail("SIGNED_LEDGER_REQUIRED", "externally signed dependency ledger required")
+    elif trust is not None:
+        try:
+            if expected is None or semantic_approval is None:
+                raise SecurityBoundaryError("trusted source rebuild/approval unavailable")
+            payload = signed_ledger["payload"]
+            if not isinstance(payload, Mapping):
+                raise SecurityBoundaryError("invalid ledger payload")
+            expected_payload = prepare_ledger_payload(
+                seal=expected.evidence_seal,
+                draft_sha256=expected.sha256, core_sha256=expected.core_sha256,
+                citations_sha256=digest({"records": [asdict(ref) for ref in citations]}),
+                approval_digest=digest(semantic_approval),
+                sequence=trust.expected_sequence,
+                previous_digest=payload["previous_digest"])
+            verify_signed_ledger(signed_ledger, trust, expected_payload)
+        except (SecurityBoundaryError, ValueError, TypeError, KeyError) as exc:
+            issues.append(GateFinding("CRITICAL_LEDGER_CORRUPTION", "CRITICAL",
+                                      f"publication locked: {type(exc).__name__}: {exc}"))
 
     issues.extend(check_claim_evidence(citations, used_claims))
     return G6Report("BLOCKED" if issues else "READY_FOR_SUBMISSION", tuple(issues),

@@ -173,3 +173,8 @@ cryptographically by LaTeX itself or against a privileged process mutating all
 trusted inputs. The TeX compile smoke test SKIPs explicitly if TeX is missing.
 
 No private PDF or unsupported citations are published with the repository.
+
+
+## Phase 9: externally signed semantic bridge and ledger checkpoint
+
+An independent reviewer explicitly approves the exact PDF-to-ModelSpec interpretation using detached Ed25519 signatures. G6 separately requires a signed evidence ledger and an **out-of-band protected checkpoint**; local hashes alone cannot stop a writer who directly edits both data and hashes. A mismatch triggers `CRITICAL_LEDGER_CORRUPTION` and blocks publication. The `security` extra pins Ed25519 cryptography (already in the current CI lock). See `docs/SECURITY.md`, `docs/OPERATIONS.md` and `docs/RELEASE_CRITERIA.md`.
