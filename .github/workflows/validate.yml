@@ -44,6 +44,13 @@ jobs:
         run: python -c "from pathlib import Path; assert Path('schemas/replication-report.schema.json').read_bytes() == Path('src/emr/schemas/replication-report.schema.json').read_bytes()"
       - name: Validate Phase 8 G6 schema mirror
         run: python -c "from pathlib import Path; assert Path('schemas/g6-audit.schema.json').read_bytes() == Path('src/emr/schemas/g6-audit.schema.json').read_bytes()"
+      - name: RC1 Docker Compose static validation
+        env:
+          EMR_RC1_IMAGE: ghcr.io/ci-only/manifest-check@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+          EMR_MIN_SEQUENCE: "1"
+          EMR_TRUST_ROOT_FILE: /tmp/rc1-root.pub
+          EMR_SIGNED_POLICY_FILE: /tmp/rc1-policy.json
+        run: docker compose config -q
       - name: Unit and integration tests
         run: python -m pytest -q
       - name: CLI contract smoke
