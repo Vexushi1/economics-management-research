@@ -13,18 +13,21 @@ from dataclasses import asdict, dataclass
 from typing import Literal
 
 from emr.adapters.pdf_extract import PdfDocument
-from emr.core.evidence_chain import anchor_ref, audit_evidence_seal
-from emr.core.security import (
-    SecurityBoundaryError, TrustPolicy, digest, prepare_ledger_payload,
-    verify_semantic_approval, verify_signed_ledger,
-)
 from emr.adapters.symbolic_sympy import compile_game
-from emr.domain.proof import model_fingerprint
+from emr.core.evidence_chain import anchor_ref, audit_evidence_seal
 from emr.core.provenance import SourceAnchor
+from emr.core.security import (
+    SecurityBoundaryError,
+    TrustPolicy,
+    digest,
+    prepare_ledger_payload,
+    verify_semantic_approval,
+    verify_signed_ledger,
+)
 from emr.domain.citation_audit import CitationAuditError, CitationRecord, validate_citations
 from emr.domain.game import ValidatedGameSpec
 from emr.domain.manuscript import DraftArtifact, ManuscriptError, assemble_manuscript, trusted_core
-from emr.domain.proof import ProofAuditError, ProofLedger, render_verification_report
+from emr.domain.proof import ProofAuditError, ProofLedger, model_fingerprint, render_verification_report
 
 
 @dataclass(frozen=True, slots=True)
