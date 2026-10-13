@@ -7,3 +7,11 @@
 **Stable** (not yet certified): independent security assessment, disaster recovery including rollback/replay drills, complete key-custody processes, publication-specific manual semantic and reference audits, licensed third-party notice audit, supply-chain vulnerability response.
 
 A green pytest pipeline is not a mathematical proof, a full PDF semantic verification, a causal-identification certificate, or a production security audit.
+
+## RC1 review (2026-10-13)
+
+**Status: ALPHA RELEASE CANDIDATE / NOT PRODUCTION CERTIFIED.** See `docs/RC1_DEPLOYMENT.md`.
+
+Implemented code paths: Vault Transit remote Ed25519 signing request + separately privileged rotation request; external signed/expiring checkpoint retrieval with pinned root and minimum sequence; containerized read-only checkpoint endpoint; G6 external trust preflight with fail-closed CRITICAL status; single-host Compose network/capability/filesystem hardening and private-input ignore patterns. Test hooks use synthetic keys only.
+
+**Mandatory release blockers for production:** no deployed enterprise Vault/KMS tenant and reviewed RBAC; no managed multi-host isolation; no hardened identity attestation and controlled issuer/reviewer separation-of-duties; no independent security penetration test; no operational key rotation/revocation/restore drill; no automatic SOC routing for CRITICAL events; no evidence of production TeX build reproducibility; no proven semantic correctness for real uploaded articles; no general solution to arbitrary HJB/optimization or automatic full causal identification. A green CI or Compose lint is neither deployment nor certification.

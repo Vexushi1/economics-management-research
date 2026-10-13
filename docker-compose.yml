@@ -1,0 +1,52 @@
+# Single-host sandbox. Docker networks are NOT physical host separation.
+# Images must be prebuilt, security-scanned, then supplied by immutable digest.
+services:
+  g6:
+    image: ${EMR_RC1_IMAGE:?Set reviewed image@sha256 digest}
+    command: ["python", "-m", "emr.services.g6_service"]
+    read_only: true
+    user: "65532:65532"
+    cap_drop: ["ALL"]
+    security_opt: ["no-new-privileges:true"]
+    pids_limit: 128
+    mem_limit: 512m
+    cpus: 1.0
+    tmpfs: ["/tmp:rw,noexec,nosuid,nodev,size=16m"]
+    ports: ["127.0.0.1:8081:8081"]
+    networks: ["g6_ingress", "checkpoint_link"]
+    environment:
+      EMR_CHECKPOINT_URL: http://checkpoint:8080/v1/trust-policy
+      EMR_ROOT_PUBLIC_KEY_PATH: /run/trust/root.pub
+      EMR_MIN_SEQUENCE: ${EMR_MIN_SEQUENCE:?Independently pinned release sequence}
+      EMR_INTERNAL_HTTP_FOR_DEV: "1"
+    volumes:
+      - type: bind
+        source: ${EMR_TRUST_ROOT_FILE:?Read-only pinned root public key file}
+        target: /run/trust/root.pub
+        read_only: true
+    depends_on: ["checkpoint"]
+  checkpoint:
+    image: ${EMR_RC1_IMAGE:?Set reviewed image@sha256 digest}
+    command: ["python", "-m", "emr.services.checkpoint_service"]
+    read_only: true
+    user: "65532:65532"
+    cap_drop: ["ALL"]
+    security_opt: ["no-new-privileges:true"]
+    pids_limit: 64
+    mem_limit: 128m
+    cpus: 0.5
+    tmpfs: ["/tmp:rw,noexec,nosuid,nodev,size=8m"]
+    networks: ["checkpoint_link"]
+    environment:
+      EMR_SIGNED_POLICY_PATH: /run/checkpoint/trust-policy.json
+    volumes:
+      - type: bind
+        source: ${EMR_SIGNED_POLICY_FILE:?Externally signed policy JSON}
+        target: /run/checkpoint/trust-policy.json
+        read_only: true
+networks:
+  g6_ingress:
+    driver: bridge
+  checkpoint_link:
+    driver: bridge
+    internal: true
