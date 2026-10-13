@@ -63,6 +63,8 @@ jobs:
                   "literature-matrix.schema.json",
                   "model-spec.schema.json",
                   "equilibrium-result.schema.json",
+                  "proposition.schema.json",
+                  "verification-report.schema.json",
                   "model-spec.schema.json",
               ):
                   assert f"emr/schemas/{name}" in names

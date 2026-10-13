@@ -101,3 +101,20 @@ closed boundaries, exact FOC, curvature and interval KKT signs. Numerical
 multi-start SciPy reports are `LOCAL_CANDIDATES_ONLY`; they must never be cited
 as formal proofs. Contract coordination, IR, enumerated IC and transfer balance
 are separately checked, not conflated. Synthetic fixtures do not copy papers.
+
+## Phase 5: auditable proof obligations (opt-in research review)
+
+`emr.domain.proof` provides versioned proposition contracts, explicit proof debts,
+independently reviewed state transitions and **exactly recalculated** counterexamples.
+A `SKETCH_ACCEPTED` status is **not** `PROVED`. Strict LaTeX export refuses
+uncertified propositions; ordinary export retains visible `\unproven{}` markers.
+A checked contradiction freezes that proposition version, while narrowing its
+parameter domain generates a fresh, unverified report.
+
+The initial adversarial audit supports concrete bounded rational witnesses to
+wrong derivative claims and optimality errors when Phase 4 has independently
+checked a global optimum. Solver failure, root-finding failure or local numeric
+candidates are **not counterexamples**. Manual proof certification is an explicit
+reviewer attestation, not automatic formal theorem proving or a cryptographic
+identity verification service. All calculations originate from prevalidated
+Phase 3 mathematical ASTs; no untrusted PDF formula text is executed.
