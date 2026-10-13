@@ -94,7 +94,8 @@ class VaultTransitSigner:
 
 def sign_record(signer: ExternalSigner, payload: dict, *, purpose: str) -> str:
     """Explicit domain-separated envelope signature; never sympify/eval input."""
-    domains = {"semantic": b"EMR:SEMANTIC:V1\0", "ledger": b"EMR:LEDGER:V1\0"}
+    domains = {"semantic": b"EMR:SEMANTIC:V1\0", "ledger": b"EMR:LEDGER:V1\0",
+               "checkpoint": b"EMR:CHECKPOINT:V1\0"}
     if purpose not in domains:
         raise KmsError("unknown signing purpose")
     signature = signer.sign(domains[purpose] + canonical_json(payload))
@@ -130,3 +131,11 @@ def rotate_vault_transit_key(*, base_url: str, key_name: str,
                 raise KmsError("Vault rotation response too large")
     except (HTTPError, URLError, OSError, ValueError) as exc:
         raise KmsError("Vault key rotation failed closed") from exc
+
+
+def sign_checkpoint_policy(signer: ExternalSigner, policy: dict) -> dict:
+    """Issuer-side Ed25519 envelope. This capability never runs in G6.
+
+    Policy creation and reviewer authority must be approved out of band.
+    """
+    return {"policy": policy, "signature": sign_record(signer, policy, purpose="checkpoint")}

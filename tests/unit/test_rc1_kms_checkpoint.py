@@ -127,3 +127,18 @@ def test_checkpoint_current_time_expiration_and_no_secret_fields():
     with pytest.raises(SecurityBoundaryError):
         verify_checkpoint_envelope(env, pub(root), minimum_sequence=8,
                                    now=datetime(2100, 1, 1, tzinfo=UTC))
+
+
+def test_external_checkpoint_issuer_signs_versioned_policy_and_verifies():
+    from emr.adapters.kms import sign_checkpoint_policy
+
+    root, envelope = checkpoint()
+
+    class IssuerOutsideG6:
+        def sign(self, msg):
+            assert msg.startswith(b"EMR:CHECKPOINT:V1\\0")
+            return root.sign(msg)
+
+    issued = sign_checkpoint_policy(IssuerOutsideG6(), envelope["policy"])
+    assert issued == envelope
+    assert verify_checkpoint_envelope(issued, pub(root), minimum_sequence=8).expected_sequence == 8
