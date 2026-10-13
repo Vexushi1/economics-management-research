@@ -1,0 +1,7 @@
+{
+  "distribution_type":"finite_joint",
+  "scenarios":[{"id":"low_supply","probability":"0.25"},{"id":"high_supply","probability":"0.75"}],
+  "actions":["conservative","aggressive"],
+  "payoffs":[["8","-4"],["1","12"]],
+  "decision_timing":"before_observation"
+}

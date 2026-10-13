@@ -1,0 +1,32 @@
+{
+  "$schema":"https://json-schema.org/draft/2020-12/schema",
+  "$id":"https://example.invalid/emr/replication-report-v1",
+  "title":"Unverified, source-provenanced paper replication metadata",
+  "type":"object", "additionalProperties":false,
+  "required":["schema_version","paper_sha256","model_id","status","required_parameters","missing_requirements","parameter_provenance","formula_anchors","targets","diagnostics"],
+  "properties":{
+    "schema_version":{"const":"1"},
+    "paper_sha256":{"type":"string","pattern":"^[a-f0-9]{64}$"},
+    "model_id":{"type":"string","minLength":1,"maxLength":80},
+    "status":{"enum":["UNREPRODUCIBLE_INPUT","READY_FOR_REPLICATION","NUMERIC_COMPARISON_COMPLETE","COMPARISON_MISMATCH"]},
+    "required_parameters":{"type":"array","minItems":1,"maxItems":64,"uniqueItems":true,"items":{"type":"string","minLength":1,"maxLength":48}},
+    "missing_requirements":{"type":"array","maxItems":200,"uniqueItems":true,"items":{"type":"string","minLength":1,"maxLength":256}},
+    "parameter_provenance":{"type":"array","maxItems":64,"items":{"type":"object","additionalProperties":false,"required":["name","value","source_ref"],"properties":{
+      "name":{"type":"string","minLength":1,"maxLength":48},"value":{"type":"string","minLength":1,"maxLength":48},"source_ref":{"type":"string","minLength":1,"maxLength":256}}}},
+    "formula_anchors":{"type":"array","maxItems":100,"items":{"type":"string","minLength":1,"maxLength":256}},
+    "targets":{"type":"array","minItems":1,"maxItems":100,"items":{"type":"object","additionalProperties":false,
+      "required":["id","kind","source_ref","status","published_value","computed_value","absolute_error"],
+      "properties":{
+        "id":{"type":"string","minLength":1,"maxLength":80},
+        "kind":{"enum":["FORMULA","PROPOSITION","TABLE","FIGURE"]},
+        "source_ref":{"type":"string","maxLength":256},
+        "status":{"enum":["NOT_VERIFIED","NUMERIC_MATCH","NUMERIC_MISMATCH"]},
+        "published_value":{"type":["string","null"],"maxLength":64},
+        "computed_value":{"type":["string","null"],"maxLength":64},
+        "absolute_error":{"type":["string","null"],"maxLength":64}
+      }}},
+    "diagnostics":{"type":"array","maxItems":50,"items":{"type":"string","minLength":1,"maxLength":256}}
+  },
+  "allOf":[{"if":{"properties":{"status":{"const":"UNREPRODUCIBLE_INPUT"}},"required":["status"]},"then":{"properties":{"missing_requirements":{"minItems":1}}}},
+           {"if":{"properties":{"status":{"enum":["READY_FOR_REPLICATION","NUMERIC_COMPARISON_COMPLETE","COMPARISON_MISMATCH"]}},"required":["status"]},"then":{"properties":{"missing_requirements":{"maxItems":0}}}}]
+}

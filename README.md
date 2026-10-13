@@ -118,3 +118,13 @@ candidates are **not counterexamples**. Manual proof certification is an explici
 reviewer attestation, not automatic formal theorem proving or a cryptographic
 identity verification service. All calculations originate from prevalidated
 Phase 3 mathematical ASTs; no untrusted PDF formula text is executed.
+
+## Phase 6 experimental domain modules (not a general stochastic/HJB solver)
+
+Three **offline**, opt-in modules extend the Phase 5 proof-audit baseline:
+
+- `emr.domain.stochastic`: exact finite joint scenario optimization. Information order is explicit: `MAX_EXPECTATION` computes `max_a E[u(s,a)]` with a nonanticipative action, while `EXPECTATION_OF_MAX` computes `E[max_a u(s,a)]` with a contingent action. Every state probability and payoff is supplied; conditioning divides by the known retained probability mass. Continuous/infinite distributions, arbitrary integrability claims, inferred independence, and unknown tails are unsupported.
+- `emr.domain.dynamic`: bounded deterministic scalar linear-affine state control with a finite horizon, quadratic reward, and explicitly stated endpoint. It returns Pontryagin necessary-condition **tasks only** (`NECESSARY_CONDITIONS_ONLY`); unsupported stochastic HJB/differential games return `UNSUPPORTED`, and incomplete input returns `INCOMPLETE_INPUT`. It never solves or certifies a dynamic optimum.
+- `emr.domain.replication`: source-backed parameter completeness check and conservative numeric comparisons. Unknown required coefficients, published target data or original formula anchors result in `UNREPRODUCIBLE_INPUT`, never guessed defaults. Numerical agreement is not independent proof.
+
+Example synthetic fixtures reside in `tests/fixtures/stochastic_supply/`, `tests/fixtures/differential_state/` and `examples/paper-replication/`. No private paper PDFs have been added to the repository. See the corresponding Skill files for limits. Future high-risk PDF processing still requires an OS-level resource sandbox.
