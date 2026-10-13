@@ -11,8 +11,8 @@ from emr.domain.submission import check_claim_evidence
 def citation():
     return CitationRecord(
         key='citeA', claim_id='claimA', doi='10.1038/nature14236',
-        title='An independently reviewed bibliographic record',
-        authors='Fixture', year=2015, journal='Nature',
+        title='Human-level control through deep reinforcement learning',
+        authors='Mnih, Kavukcuoglu, Silver, et al.', year=2015, journal='Nature',
         metadata_status='VERIFIED', support_status='CLAIM_UNSUPPORTED',
         source_ref='fixture:source:paragraph:1', support_review_ref='fixture:review:against-claim',
         retraction_status='CLEAR',

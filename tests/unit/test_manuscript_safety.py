@@ -16,7 +16,8 @@ from emr.domain.submission import audit_submission
 
 def citations():
     return (CitationRecord('citeA', 'claimA', '10.1038/nature14236',
-                           'Synthetic metadata title', 'Synthetic author', 2015,
+                           'Human-level control through deep reinforcement learning',
+                           'Mnih, Kavukcuoglu, Silver, et al.', 2015,
                            'Nature', 'VERIFIED', 'CLAIM_UNSUPPORTED',
                            'fixture:source', 'fixture:review', 'CLEAR'),)
 

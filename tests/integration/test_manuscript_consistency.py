@@ -13,13 +13,18 @@ def _refs():
     # The DOI has a valid identity, but its (synthetically audited) passage is
     # deliberately stipulated NOT to support the claim. No automatic semantics.
     return (CitationRecord('ref', 'claimA', '10.1038/nature14236',
-                           'Synthetic bibliographic assertion', 'Auditor', 2015,
+                           'Human-level control through deep reinforcement learning',
+                           'Mnih, Kavukcuoglu, Silver, et al.', 2015,
                            'Nature', 'VERIFIED', 'CLAIM_UNSUPPORTED',
                            'fixture:passage', 'fixture:semantic-review', 'CLEAR'),)
 
 
 def _context(phase8_context):
     doc, anchor, model, params, ledger, prose = phase8_context
+    prose['literature_review'] = (
+        'This Nature deep-reinforcement-learning article proves parallel trends '
+        'for livestream DID identification [CITE:claimA].'
+    )  # Deliberately unsupported cross-domain attribution.
     draft = assemble_manuscript(doc, anchor, model, params, ledger,
                                 'PropBound', 1, prose, _refs())
     return draft, doc, anchor, model, params, ledger, prose
