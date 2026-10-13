@@ -1,0 +1,116 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/emr/g6-audit-v1",
+  "title": "G6 Offline Manuscript Reconciliation Report",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "status",
+    "upstream_status",
+    "recalculated_tex_sha256",
+    "findings"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1"
+    },
+    "status": {
+      "enum": [
+        "BLOCKED",
+        "READY_FOR_SUBMISSION"
+      ]
+    },
+    "upstream_status": {
+      "enum": [
+        "CURRENT",
+        "STALE"
+      ]
+    },
+    "recalculated_tex_sha256": {
+      "anyOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        }
+      ]
+    },
+    "findings": {
+      "type": "array",
+      "maxItems": 200,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "code",
+          "severity",
+          "message",
+          "expected_digest",
+          "observed_digest"
+        ],
+        "properties": {
+          "code": {
+            "type": "string",
+            "pattern": "^[A-Z][A-Z0-9_]{2,79}$"
+          },
+          "severity": {
+            "enum": [
+              "BLOCKER",
+              "WARNING"
+            ]
+          },
+          "message": {
+            "type": "string",
+            "maxLength": 1200
+          },
+          "expected_digest": {
+            "anyOf": [
+              {
+                "type": "null"
+              },
+              {
+                "type": "string",
+                "pattern": "^[a-f0-9]{64}$"
+              }
+            ]
+          },
+          "observed_digest": {
+            "anyOf": [
+              {
+                "type": "null"
+              },
+              {
+                "type": "string",
+                "pattern": "^[a-f0-9]{64}$"
+              }
+            ]
+          }
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "const": "READY_FOR_SUBMISSION"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "findings": {
+            "maxItems": 0
+          },
+          "upstream_status": {
+            "const": "CURRENT"
+          }
+        }
+      }
+    }
+  ]
+}

@@ -1,4 +1,4 @@
-name: Phase 7 Evidence Chain + Empirical CI (hash-locked)
+name: Phase 8 Manuscript G6 Audit CI (hash-locked)
 
 on:
   pull_request:
@@ -40,6 +40,8 @@ jobs:
         run: python -c "from importlib.metadata import version; assert version('scipy') == '1.17.0'"
       - name: Validate Phase 6 pinned schema mirror
         run: python -c "from pathlib import Path; assert Path('schemas/replication-report.schema.json').read_bytes() == Path('src/emr/schemas/replication-report.schema.json').read_bytes()"
+      - name: Validate Phase 8 G6 schema mirror
+        run: python -c "from pathlib import Path; assert Path('schemas/g6-audit.schema.json').read_bytes() == Path('src/emr/schemas/g6-audit.schema.json').read_bytes()"
       - name: Unit and integration tests
         run: python -m pytest -q
       - name: CLI contract smoke
@@ -68,6 +70,7 @@ jobs:
                   "proposition.schema.json",
                   "verification-report.schema.json",
                   "replication-report.schema.json",
+                  "g6-audit.schema.json",
               ):
                   assert f"emr/schemas/{name}" in names
           PYCODE

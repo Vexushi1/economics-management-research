@@ -105,3 +105,46 @@ def grid_table_pdf(tmp_path: Path) -> Path:
     path = tmp_path / "grid.pdf"
     path.write_bytes(_pdf([(80, 624, "A"), (230, 624, "B"), (80, 603, "1"), (230, 603, "2")], grid=True))
     return path
+
+@pytest.fixture
+def phase8_context(sample_pdf):
+    """Entirely synthetic source->model->conditional solution->proof ledger."""
+    import json
+
+    from emr.adapters.pdf_extract import extract_pdf
+    from emr.adapters.symbolic_sympy import compile_game
+    from emr.core.evidence_chain import anchor_ref
+    from emr.core.provenance import make_anchor
+    from emr.domain.game import validate_game_spec
+    from emr.domain.proof import (
+        ProofLedger,
+        audit_proof_step,
+        model_fingerprint,
+        register_obligation,
+    )
+
+    doc = extract_pdf(sample_pdf)
+    anchor = make_anchor(doc, 1, 0, 0, 8)
+    base = Path(__file__).resolve().parent / 'fixtures/stackelberg_linear/baseline.json'
+    raw = json.loads(base.read_text(encoding='utf-8'))
+    raw['source'] = {'kind': 'paper_anchor', 'file_sha256': doc.sha256, 'page': 1,
+                     'note': 'Synthetic only: semantic correspondence not verified'}
+    model = validate_game_spec(raw)
+    ledger = ProofLedger()
+    ledger.register({
+        'schema_version': '1', 'id': 'PropBound', 'statement': 'Conditional follower optimum',
+        'author': 'Synthetic author', 'proof_version': 1,
+        'model_sha256': model_fingerprint(compile_game(model)),
+        'quantifiers': [{'kind': 'forall', 'symbol': 'p'}],
+        'parameter_domains': [{'symbol': 'p', 'lower': '2', 'upper': '10',
+                               'lower_closed': True, 'upper_closed': True}],
+        'assumptions': ['Synthesized fixture, not a verified source theorem'],
+        'lemma_refs': [], 'source_refs': [anchor_ref(anchor)],
+    })
+    register_obligation(ledger, 'PropBound', 1, 'FOC', 'Review complete best-response argument')
+    audit_proof_step(ledger, 'PropBound', 1, 's1', 'FOC', 'OK', ('synth:FOC',))
+    params = {'A': '10', 'a': '1', 'b': '1', 'c': '1', 'gamma': '0.2', 'w': '2'}
+    prose = {'introduction': 'We introduce a synthetic setting.',
+             'literature_review': 'An external paper is discussed [CITE:claimA].',
+             'conclusion': 'No external economic theorem is claimed.'}
+    return doc, anchor, model, params, ledger, prose

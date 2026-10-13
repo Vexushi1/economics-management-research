@@ -1,0 +1,17 @@
+% Illustrative shell only. The manuscript assembler creates the audited output.
+% Never paste LLM-authored math or untrusted \newcommand definitions into the core.
+\documentclass{article}
+\usepackage[T1]{fontenc}
+\providecommand{\unproven}[1]{\textbf{[UNPROVEN: #1]}}
+\begin{document}
+\section{Introduction}
+% Editable prose: escaped by assembler
+\section{Literature Review}
+% Editable prose: escaped by assembler
+\section{Model and Equilibrium}
+% Injected and sealed by src/emr/domain/manuscript.py
+\section{Conclusions}
+% Editable prose: escaped by assembler
+\appendix
+% Proof is injected by the Phase 5 ledger and may contain \unproven{...}
+\end{document}
